@@ -1,0 +1,45 @@
+#!/bin/bash 
+#Скрипт генерирует картинку из текста
+
+#INFILE='g.jpg';
+
+INFILE="$1";
+
+generate_image_from_text "$1"
+
+#ffmpeg -nostats -loglevel 0 -y -loop 1 -t 10 -f image2 -i imagefromtext.png -r 30 -vcodec h264 -tune stillimage text4video.mp4; 
+
+#Более размытая версия фона
+convert text4videofractalbackground.png -blur 25x25 background-blurred.png
+
+#Генерируем кадры с нарастанием displacement'a
+FRAMESDIR="frames"; 
+mkdir -p $FRAMESDIR; 
+#Генерируем в цикле команды на создание кадров, сохраняем в файл
+#for i in `seq 1500 -1 0`; do printf "%05d\n" $i; composite background-blurred.png imagefromtext.png -displace "$i"x"$i" $FRAMESDIR/"`printf "%05d\n" $i`.png"; done;
+echo "" > compose-commands.sh
+for i in `seq 1500 -1 0`; 
+do printf "%05d\n" $i >/dev/null; 
+echo composite background-blurred.png imagefromtext.png -displace "$i"x"$i" $FRAMESDIR/"`printf "%05d\n" $i`.png"  >>"compose-commands.sh"; 
+done;
+#Перемешиваем команды в файле
+cat "compose-commands.sh" | sort -R > "compose-commands-random.sh"
+cp "compose-commands-random.sh" "compose-commands.sh"
+echo "Generate frames";
+sleep 0.05;
+#Выполним команды в несколько потоков
+cat "compose-commands.sh" | xargs -I CMD --max-procs=8 bash -c CMD
+
+#ffmpeg -nostats -loglevel 0 -y -loop 1 -t 10 -f image2 -i imagefromtext.png -r 30 -vcodec h264 -tune stillimage text4video.mp4; 
+
+echo "Render video from frames";
+sleep 0.05;
+ffmpeg -f image2 -i $FRAMESDIR/%05d.png -r 60 -vcodec libx264 -preset ultrafast -crf 0 -tune stillimage  video-from-text.mkv
+
+#echo rm --interactive=once --verbose "text4video*"
+#rm --verbose "text4videofractalbackground.png"
+#rm --interactive=once --verbose text4video*
+
+#seq 15 | xargs --max-procs=4 -n 1 echo
+echo "Done.";
+sleep 0.35;

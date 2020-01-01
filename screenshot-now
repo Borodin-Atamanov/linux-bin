@@ -1,0 +1,60 @@
+#!/bin/bash
+. /home/i/.profile;
+export $(dbus-launch)
+DISPLAY=":0"
+
+camera_dir="/home/i/downloads/cam/";
+screen_dir="$HOME/screenshots/";
+target_dir="$screen_dir";
+
+
+#echo "" > commands.bash;
+
+sleeptime="0.0015";
+function execute_comm {
+    sleeptime="0.1";
+    echo -e "\n\nExecute '$1'";
+    sleep $sleeptime;
+    #echo "$1" >> commands.bash;
+    sleep $sleeptime;
+    echo "";
+    eval "$1";
+}
+
+
+execute_comm " ";
+
+
+export DISPLAY=$(w $(id -un) | awk 'NF > 7 && $2 ~ /tty[0-9]+/ {print $3; exit}')
+echo "DISPLAY=$DISPLAY";
+export DISPLAY=$(w $(id -un) | awk 'NF > 7 && $2 ~ /tty[0-9]+/ {print $3; exit}')
+echo "DISPLAY=$DISPLAY";
+DISPLAY=":0.0"
+export $DISPLAY
+
+execute_comm "xdpyinfo | grep 'dimensions:'";
+CUR_RESOLUTION=`xdpyinfo | grep 'dimensions:' | awk '{print $2}'`;
+echo "CUR_RESOLUTION=${CUR_RESOLUTION}";
+CUR_RESOLUTION=`xrandr -q|sed -n 's/.*current[ ]\([0-9]*\) x \([0-9]*\),.*/\1x\2/p'`;
+echo "CUR_RESOLUTION=${CUR_RESOLUTION}";
+#xrandr --current | grep 'current'
+mkdir -pv "${screen_dir}"
+cd "${screen_dir}";
+target_fname_png="$(date "+%F-%H-%M-%S--%N")-screen.png";
+#target_fname_jpg="$(date "+%F-%H-%M-%S--%N")-screen.jpg";
+execute_comm "timeout --kill-after=9 15 ffmpeg -y -hide_banner -s ${CUR_RESOLUTION} -f x11grab -i :0.0  -vframes 1 \"${screen_dir}/${target_fname_png}\" ";
+echo $target_fname_png; 
+#execute_comm "convert \"${screen_dir}/${target_fname_png}\" -verbose -colorspace YCbCr -auto-level -interlace plane -background white -quality 33 -sampling-factor 2x2 -flatten -define jpeg:dct-method=float \"${screen_dir}/${target_fname_jpg}\""
+#execute_comm "rm -vf \"${screen_dir}/${target_fname_png}\""
+#mkdir -pv "${target_dir}";
+#cd "${target_dir}";
+#execute_comm "mv -v \"${screen_dir}/${target_fname_jpg}\" \"${target_dir}/${target_fname_jpg}\"";
+file_stat=$(stat "${screen_dir}${target_fname_png}");
+
+/usr/bin/notify-send "Screenshot" "Screenshot `date`"
+
+/usr/bin/notify-send "$target_fname_png" "${file_stat}";
+
+echo 'end'
+
+

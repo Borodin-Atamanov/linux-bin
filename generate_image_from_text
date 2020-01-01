@@ -1,0 +1,20 @@
+#!/bin/bash 
+#Скрипт генерирует картику из текста
+
+#INFILE='g.jpg';
+
+INFILE="$1";
+
+echo "Create beautiful background";
+sleep 0.05;
+convert -size 1920x1080 plasma:fractal -swirl 70 "text4videofractalbackground.png"; 
+
+
+echo "Create text with caption \"$INFILE\"";
+sleep 0.05;
+convert -antialias -background transparent -fill black -strokewidth 20 -stroke white -size 7680x4320 -gravity Center caption:"$INFILE" -swirl 10 -resize 1920x1080 "imagefromtexttransparent.png"; 
+
+echo "Compose text with the background";
+sleep 0.05;
+composite -quality 100  "imagefromtexttransparent.png" "text4videofractalbackground.png" "imagefromtext.png"; 
+

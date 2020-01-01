@@ -1,0 +1,9 @@
+#!/bin/bash 
+#Скрипт задаёт дату из имени файла
+#Файлы должны называться yyyy-mm-dd-hh-mm-ss
+
+#set date from file name to its creation date
+#Work with filenames like "2019-06-08-09-22-03--1118ms-1.jpg"
+#convert it to "YYYY-MM-DD HH:mm:ss" format
+for i in *.*; do echo $i; filedate="${i:0:4}-${i:5:2}-${i:8:2} ${i:11:2}:${i:14:2}:${i:17:2}"; echo "date = ${filedate}"; touch -a -m --date="${filedate}" "${i}"; done;
+
