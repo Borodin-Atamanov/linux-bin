@@ -32,7 +32,7 @@ GIT_DIR="/home/i/git/";
 mkdir -pv "${GIT_DIR}" | tee -a "${log_file_path}" 
 cd "${GIT_DIR}" | tee -a "${log_file_path}" 
 git clone --verbose --progress --depth 1 "${git_repo_addr}" | tee -a "${log_file_path}" 
-cd "linux-bin";   
+cd "${GIT_DIR}linux-bin";   
 git fetch --all --verbose --progress | tee -a "${log_file_path}" 
 git reset --hard origin/master | tee -a "${log_file_path}" 
 git status --verbose | tee -a "${log_file_path}" 
