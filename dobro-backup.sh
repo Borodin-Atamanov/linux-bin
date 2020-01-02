@@ -11,20 +11,31 @@ function nowcopy () {
     echo -e "\n\n\n";
     echo "`date +%Y-%m-%d-%H-%M-%S`: copy from ${1} to ${2}"  | tee -a "${log_file_path}" 
     #rsync --dry-run 
-    rsync --info=progress2 --checksum --progress --recursive --human-readable --verbose --exclude=".sync" --exclude=".sync"  "${1}" "${2}" | tee -a "${log_file_path}" 
+    rsync --info=progress2 --checksum --progress --recursive --human-readable --verbose --exclude=".git" --exclude=".sync"  "${1}" "${2}" | tee -a "${log_file_path}" 
 }
 
 function nowcopy_small_files () {
     echo -e "\n\n\n";
     echo "`date +%Y-%m-%d-%H-%M-%S`: copy smallfiles from ${1} to ${2}"  | tee -a "${log_file_path}" 
     #rsync --dry-run 
-    rsync --info=progress2 --checksum --progress --recursive --human-readable --verbose --exclude=".sync" --exclude=".sync" --max-size=40m  "${1}" "${2}" | tee -a "${log_file_path}" 
+    rsync --info=progress2 --checksum --progress --recursive --human-readable --verbose --exclude=".git" --exclude=".sync" --max-size=40m  "${1}" "${2}" | tee -a "${log_file_path}" 
 }
 
 #Копируем файлы из $1 в $2
 nowcopy "/home/i/dobro/" "/home/i/backups/dobro/"
 sleep 0.01;
-nowcopy "/home/i/dobro/.bin-source/" "/home/i/bin/"
+
+#nowcopy "/home/i/dobro/.bin-source/" "/home/i/bin/"
+#Copy all files from github repository
+GIT_DIR="/home/i/git/";
+mkdir -pv "${GIT_DIR}";
+cd "${GIT_DIR}";
+git clone https://github.com/Borodin-Atamanov/linux-bin.git
+cd "linux-bin";
+git fetch --all
+git reset --hard origin/master
+nowcopy "/home/i/git/linux-bin/" "/home/i/bin/"
+
 sleep 0.01;
 #chmod --changes --recursive +x "/home/i/bin/"
 #поставить права на файлы в папке /home/i/bin/
