@@ -1,0 +1,90 @@
+#!/bin/bash 
+
+#Path to audio and subtitles files
+#FILE_PATH_AAC="/home/i/bin/rarjpeg.aac";
+FILE_PATH_AAC="/home/i/bin/rarjpeg-stereo.aac";
+FILE_PATH_SRT="/home/i/bin/rarjpeg.srt";
+#INFILE='g.jpg';
+#TODO make aac,srt path calculated by https://stackoverflow.com/questions/59895/get-the-source-directory-of-a-bash-script-from-within-the-script-itself
+
+INFILE="$1";
+if [ -z "$INFILE" ]; then
+   echo 'File "<empty sting>" does not exist! First argument must be a regular file'
+   exit;
+fi
+
+if [ -f "$INFILE" ]; then
+    echo "File $INFILE exists."
+    sleep 0.2;
+else
+   echo "File $INFILE does not exist."
+   exit;
+fi
+
+echo "Create beautiful background";
+sleep 0.2;
+#3840x2160
+#4224x2376
+convert -size 1920x1080 plasma:fractal -swirl 70 -adaptive-resize 3840x2160 "text4videofractalbackground.png"; 
+
+echo "Create text with help"
+#convert -background lightblue -fill blue -font Candice -size 320x140 \
+#   caption:'This text is resized to best fill the space given.' \
+#   caption_filled.gif
+convert -background transparent -fill '#000000FF' -strokewidth 2 -stroke '#FFFFFFFF' -size 3640x460 -gravity Center caption:"Переименуйте этот файл в \"$INFILE\" и разархивируйте как обычный архив" -adaptive-resize 3640x460 "text4video-help.png"
+
+echo "Create text with file name \"$INFILE\"";
+sleep 0.2;
+convert -antialias -background transparent -fill '#000000FF' -strokewidth 5 -stroke '#FFFFFFFF' -size 3640x1500 -gravity Center caption:"$INFILE" -swirl 10 -adaptive-resize 3640x1500 "text4video-caption.png"; 
+
+echo "Create empty background";
+sleep 0.2;
+#convert -background transparent -size 3840x2160 "text4video-transparent-background.png"; 
+convert -size 3840x2160 xc:"rgba(0,0,0,0)" -type truecolormatte PNG32:"text4video-transparent-background.png"; 
+
+echo "Compose caption text with transparent background";
+sleep 0.2;
+composite  "text4video-caption.png"  "text4video-transparent-background.png" -gravity north "text4video.png"
+
+echo "Compose help text with caption text";
+sleep 0.2;
+composite "text4video-help.png"  "text4video.png" -gravity south "text4video.png"
+
+echo "Compose texts with the fractal background";
+sleep 0.2;
+composite -quality 100  "text4video.png" "text4videofractalbackground.png" -gravity center "text4video.png"; 
+
+echo "Sharpen image";
+sleep 0.2;
+convert "text4video.png"  -sharpen 5x15  -sharpen 15x15  -sharpen 35x15  -quality 100 "text4video.png"
+cp "text4video.png" "text4video-sharpen.png"
+echo "Resize to full HD";
+sleep 0.2;
+convert "text4video.png" -adaptive-resize 1920x1080  "text4video.png"
+echo "Sharpen image more";
+sleep 0.2;
+convert "text4video.png" -sharpen 35x20 "text4video.png"
+
+echo "Render video";
+sleep 0.2;
+#"unsharp=lx=7:ly=7:la=-2:enable='between(t,1,2)',"
+#rotate=A*sin(2*PI/T*t)
+#ffmpeg -hide_banner -y -loop 1 -t 10 -f image2 -i text4video.png -r 30 -vf hue="H=0.413*PI*t:s=sin(0.15*PI*t),unsharp=lx=3:ly=3:la=5:enable='between(n,30,59)',unsharp=lx=3:ly=3:la=4:enable='between(n,60,89)',unsharp=lx=3:ly=3:la=3:enable='between(n,90,119)',unsharp=lx=3:ly=3:la=2:enable='between(n,120,149)',unsharp=lx=3:ly=3:la=1:enable='between(n,150,179)',unsharp=lx=3:ly=3:la=0:enable='between(n,180,209)',unsharp=lx=3:ly=3:la=0.5:enable='between(n,210,239)',unsharp=lx=3:ly=3:la=1:enable='between(n,240,269)',unsharp=lx=3:ly=3:la=2:enable='between(n,270,10000)',null"  -vcodec libx264 -preset veryfast -crf 30 -movflags +faststart -pix_fmt yuv420p -profile:v baseline -level 3.0 "text4video-only-video.mp4"; 
+ffmpeg -hide_banner -y -loop 1 -t 10 -f image2 -r 30 -i text4video.png -r 30 -vf "hue=H=0.173*PI*t,unsharp=lx=11:ly=7:la=5,null"  -vcodec libx264 -preset veryfast -crf 30 -movflags +faststart -pix_fmt yuv420p -profile:v baseline -level 3.0 "text4video-only-video.mp4"; 
+
+
+#-loglevel 0
+ffmpeg -hide_banner  -y -i "text4video-only-video.mp4" -i "${FILE_PATH_AAC}" -i "${FILE_PATH_SRT}" -map 0:v -map 1:a -map 2:s -codec copy -c:s mov_text  -movflags +faststart "text4video.mp4"; 
+
+echo "Compose video with \"$INFILE\"";
+sleep 0.2;
+cat "text4video.mp4" "$INFILE" > "$INFILE.mp4";
+
+echo "All done!";
+sleep 3.2;
+
+#echo rm --interactive=once --verbose "text4video*"
+#--interactive=once
+rm --verbose "text4videofractalbackground.png"
+rm --verbose text4video*
+
