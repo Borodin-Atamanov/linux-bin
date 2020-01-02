@@ -7,6 +7,9 @@
 
 log_file_path="/home/i/bin/logs/dobro-backup.log";
 git_repo_addr="https://github.com/Borodin-Atamanov/linux-bin.git";
+mkdir -pv `dirname "${log_file_path}"`
+GIT_DIR="/home/i/git-linux-bin-fresh/";
+mkdir -pv "${GIT_DIR}" | tee -a "${log_file_path}" 
 
 function nowcopy () {
     echo -e "\n\n\n";
@@ -28,15 +31,13 @@ sleep 0.01;
 
 #nowcopy "/home/i/dobro/.bin-source/" "/home/i/bin/"
 #Copy all files from github repository
-GIT_DIR="/home/i/git/";
-mkdir -pv "${GIT_DIR}" | tee -a "${log_file_path}" 
-cd "${GIT_DIR}" | tee -a "${log_file_path}" 
-git clone --verbose --progress --depth 1 "${git_repo_addr}" | tee -a "${log_file_path}" 
-cd "${GIT_DIR}linux-bin";   
+cd "${GIT_DIR}"
+git clone --verbose --progress --depth 1 "${git_repo_addr}" "${GIT_DIR}" | tee -a "${log_file_path}" 
+#cd "${GIT_DIR}linux-bin";
 git fetch --all --verbose --progress | tee -a "${log_file_path}" 
 git reset --hard origin/master | tee -a "${log_file_path}" 
 git status --verbose | tee -a "${log_file_path}" 
-nowcopy "/home/i/git/linux-bin/" "/home/i/bin/"
+nowcopy "${GIT_DIR}" "/home/i/bin/"
 
 sleep 0.01;
 #chmod --changes --recursive +x "/home/i/bin/"
