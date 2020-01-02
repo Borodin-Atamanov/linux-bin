@@ -29,8 +29,8 @@ sleep 0.01;
 #nowcopy "/home/i/dobro/.bin-source/" "/home/i/bin/"
 #Copy all files from github repository
 GIT_DIR="/home/i/git/";
-mkdir -pv "${GIT_DIR}"; | tee -a "${log_file_path}" 
-cd "${GIT_DIR}"; | tee -a "${log_file_path}" 
+mkdir -pv "${GIT_DIR}" | tee -a "${log_file_path}" 
+cd "${GIT_DIR}" | tee -a "${log_file_path}" 
 git clone --verbose --progress --depth 1 "${git_repo_addr}" | tee -a "${log_file_path}" 
 cd "linux-bin";
 git fetch --all --verbose --progress | tee -a "${log_file_path}" 
