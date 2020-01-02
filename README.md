@@ -1,7 +1,7 @@
 #Some bash scripts for my linux machines
 
 ## 4kjpeg
-
+Converts all images to 3840x2160 with imagemagick
 
 ## anime.sh
 
