@@ -46,7 +46,7 @@ First argument is "a text"
 ## generate_video_from_text
 Generate random video from text with ImageMagick and ffmpeg
 First argument is "a text".
-8K-4320p Example: https://www.youtubdfdfe.com/watch?v=kR5F1z87DMA
+8K-4320p Example: https://www.youtube.com/watch?v=kR5F1z87DMA
 
 ## host-is-online.sh
 Save to log info about runtime, network usage, memory, etc
