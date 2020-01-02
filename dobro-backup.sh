@@ -6,6 +6,7 @@
 #Скрипт делает копию файлов из заданной папки в другую, не удаляет файлы из второй папки, если они пропали в первой. Копирует файлы только если они более новые или изменился их размер.
 
 log_file_path="/home/i/bin/logs/dobro-backup.log";
+git_repo_addr="https://github.com/Borodin-Atamanov/linux-bin.git";
 
 function nowcopy () {
     echo -e "\n\n\n";
@@ -28,12 +29,13 @@ sleep 0.01;
 #nowcopy "/home/i/dobro/.bin-source/" "/home/i/bin/"
 #Copy all files from github repository
 GIT_DIR="/home/i/git/";
-mkdir -pv "${GIT_DIR}";
-cd "${GIT_DIR}";
-git clone https://github.com/Borodin-Atamanov/linux-bin.git
+mkdir -pv "${GIT_DIR}"; | tee -a "${log_file_path}" 
+cd "${GIT_DIR}"; | tee -a "${log_file_path}" 
+git clone --verbose --progress --depth 1 "${git_repo_addr}" | tee -a "${log_file_path}" 
 cd "linux-bin";
-git fetch --all
-git reset --hard origin/master
+git fetch --all --verbose --progress | tee -a "${log_file_path}" 
+git reset --hard origin/master | tee -a "${log_file_path}" 
+git status --verbose | tee -a "${log_file_path}" 
 nowcopy "/home/i/git/linux-bin/" "/home/i/bin/"
 
 sleep 0.01;
