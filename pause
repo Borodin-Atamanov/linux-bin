@@ -1,3 +1,4 @@
 #!/bin/bash 
+#Where is this feature used?
 function pause() { read -p "Press any key to continue `date +%Y-%m-%d-%H-%M-%S`"; };
 pause;
