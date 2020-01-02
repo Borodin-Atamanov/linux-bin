@@ -34,7 +34,8 @@ cat "compose-commands.sh" | xargs -I CMD --max-procs=8 bash -c CMD
 
 echo "Render video from frames";
 sleep 0.05;
-ffmpeg -f image2 -i $FRAMESDIR/%05d.png -r 60 -vcodec libx264 -preset ultrafast -crf 0 -tune stillimage  video-from-text.mkv
+#ffmpeg -f image2 -i $FRAMESDIR/%05d.png -r 60 -vcodec libx264 -preset ultrafast -crf 0 -tune stillimage  video-from-text.mkv
+ffmpeg -hide_banner -r 30 -f image2 -i $FRAMESDIR/%05d.png -r 30 -vcodec libx264 -preset veryslow -crf 18 -movflags +faststart -pix_fmt yuv420p -profile:v baseline -level 3.0 "video-from-text.mkv"
 
 #echo rm --interactive=once --verbose "text4video*"
 #rm --verbose "text4videofractalbackground.png"
