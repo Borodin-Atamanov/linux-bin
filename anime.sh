@@ -22,5 +22,5 @@ cmd="timeout --kill-after=9 ${duration}  /usr/games/oneko -display ${DISPLAY} -f
 echo "${cmd}";
 ${cmd}
 
-#exit;
+#
 camera-and-screen-capture-now
