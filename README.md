@@ -63,6 +63,9 @@ Gets md5sum of files in current directory. Possible using: find . -type d -exec 
 ## minimize-all-windows.sh
 Minimize all windows in KDE with wmctrl -l
 
+## modifydate-add-to-fname
+Script renames file in current directory. Adds file modify date before file name. Uses exiftool 
+
 ## morph-images
 Morphing images with G'MIC
 
