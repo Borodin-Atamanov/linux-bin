@@ -23,5 +23,5 @@ while true; do sleep 0.1;
     #echo; >> ${fname};
     
     date "+%F-%H-%M-%S";
-    sleep 817;
+    sleep 899;
 done;
