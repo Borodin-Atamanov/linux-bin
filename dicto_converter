@@ -94,7 +94,7 @@ execute_comm "$FFCOMMAND";
 lyrics=`cat "${DIR}/norm-stereo.lrc"`
 echo ${lyrics};
 echo "Convert to aac in m4a container [$i]"
-FFCOMMAND=$(echo "$ffmpeg_alternative -threads $threads -hide_banner -y -i \"${DIR}/norm-stereo.wav\"  -i \"${DIR}/norm-stereo.srt\"  -i \"${DIR}/orig.srt\" -metadata lyrics=\"${lyrics}\"  -metadata comment=\"${lyrics}\"  -map 0:a -map 1:s -map 2:s  -c:a aac -b:a 128k -ar 48000 -movflags +faststart -vn -c:s mov_text \"${READYDIR}/${i%.*}.mp4\"; ");
+FFCOMMAND=$(echo "$ffmpeg_alternative -threads $threads -hide_banner -y -i \"${DIR}/norm-stereo.wav\"  -i \"${DIR}/norm-stereo.srt\"  -i \"${DIR}/orig.srt\" -metadata lyrics=\"${lyrics}\"  -metadata comment=\"${lyrics}\"  -metadata title=\" \" -metadata author=\" \" -map 0:a -map 1:s -map 2:s  -c:a aac -b:a 128k -ar 48000 -movflags +faststart -vn -c:s mov_text \"${READYDIR}/${i%.*}.mp4\"; ");
 execute_comm "$FFCOMMAND";
 sleep 0.1;
 mv --verbose "${READYDIR}/${i%.*}.mp4" "${READYDIR}/${i%.*}.m4a";
