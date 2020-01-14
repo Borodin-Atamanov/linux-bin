@@ -45,7 +45,7 @@ target_fname_png_15="$(date "+%F-%H-%M-%S--%N")-screen15deg.png";
 #target_fname_jpg="$(date "+%F-%H-%M-%S--%N")-screen.jpg";
 execute_comm "timeout --kill-after=9 15 ffmpeg -y -hide_banner -s ${CUR_RESOLUTION} -f x11grab -i :0.0  -vframes 1 \"${screen_dir}/${target_fname_png}\" ";
 echo $target_fname_png; 
-execute_comm "ANGLE='1.5'; convert \"${target_fname_png}\" -antialias -interlace plane -background '#FFFFFF00' -quality 100 -flatten -rotate 0.5 \"${target_fname_png_15}\"";
+execute_comm "convert \"${target_fname_png}\" -antialias -interlace plane -background '#FFFFFF00' -quality 100 -flatten -rotate 0.5 \"${target_fname_png_15}\"";
 #execute_comm "convert \"${screen_dir}/${target_fname_png}\" -verbose -colorspace YCbCr -auto-level -interlace plane -background white -quality 33 -sampling-factor 2x2 -flatten -define jpeg:dct-method=float \"${screen_dir}/${target_fname_jpg}\""
 #execute_comm "rm -vf \"${screen_dir}/${target_fname_png}\""
 #mkdir -pv "${target_dir}";
