@@ -43,7 +43,7 @@ do echo -e "\n\nMIN_SIZE=${MIN_SIZE} MAX_SIZE=${MAX_SIZE}\n\n";
         j=$((j+1)); 
         PREFFIX=`printf "%02d" $j`; 
         SIZE_DIR="${PREFFIX}--${MIN_SIZE}--${MAX_SIZE}"; 
-        TARGET_DIR="${TO}/${SIZE_DIR}"; 
+        TARGET_DIR="${FROM}/${SIZE_DIR}"; 
     else
         TARGET_DIR="${TO}";
     fi;
