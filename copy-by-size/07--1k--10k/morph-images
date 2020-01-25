@@ -1,0 +1,98 @@
+#!/bin/bash 
+#Generate morph images from in curent directory
+
+#INFILE="$1";
+
+#threads count of morph processes
+threads=1
+
+output_format='png';
+output_format='jpg';
+
+input_format='jpg';
+input_format='jpg';
+ext=$(ls -1 | head -n 1); ext="${ext##*.}"; echo "${ext}";
+input_format="${ext}";
+
+if [ -n "$1" ]
+then
+echo Processing with morph_multiplicator=[$1].
+morph_multiplicator=$1;
+sleep 0.5;
+else
+echo "No parameters found. Argument 1 must be a morph multiplicator (just try any natural from 2 to ~100)"
+sleep 2;
+exit;
+fi
+
+function calc() { awk "BEGIN { print "$*" }"; }
+
+#directory name for output files
+morph_dir='morph'; 
+ready_dir='ready'; 
+iterator=0;
+files_count=$(($(find . -maxdepth 1 -type f -name "*.*" | wc -l)+1));
+morph_multiplicator=$(($morph_multiplicator-1));
+iterator_left=$(($files_count-1))
+#Write variable to shared memory 
+echo $iterator_left > /dev/shm/morph_all_frames_count; 
+
+mkdir -p "$morph_dir"; 
+echo "Create file for commands"
+echo "" > commands.sh
+
+#count PNG-files in input dir (None-recursive)
+#INPUT_FILES_COUNT=$(find . -maxdepth 1 -type f -name '*.png' | wc -l)
+#OUTPUT_FILES_LEFT=$(calc $INPUT_FILES_COUNT*$morph_multiplicator);
+#RENDER_SPEED=$(calc $FRAMES_IN_SEGMENT/$TIME_DIFF);
+
+#cycle by all jpg files in folder
+for i in *$input_format; 
+do echo -n "";
+#echo -n " $iterator $i "; 
+iterator_pad="$(printf %010d $iterator)";
+echo -n "$iterator ";
+#Current_file
+cur_file="$i";
+
+#prev_file
+#Если есть следующий файл prev_file - добавим команду в файл комманд
+if [ -s "$prev_file" ]; 
+then 
+    #echo "prev_file='$prev_file' file exists and is not empty ";
+    #generate comand
+    #echo "echo \"$prev_file\" \"$cur_file\"; echo -n .;"  >>"commands.sh";
+    echo "timeout 600 nice -n 45 gmic \"$prev_file\" \"$cur_file\" morph $morph_multiplicator -output \"$morph_dir/${iterator_pad}-.${output_format}\" > /dev/null 2>&1; rm -f \"$morph_dir/${iterator_pad}-_000000.${output_format}\";  iterator_left=\$(cat /dev/shm/morph_all_frames_count); iterator_left=\$((\$iterator_left-1)); echo \$iterator_left > /dev/shm/morph_all_frames_count; echo -n -e \"_\$iterator_left \"; " >> "commands.sh";
+    #TODO: Сделать так, чтобы файлы не перезаписывали друг друга, а сразу нумеровались как надо (или переименовывались как надо после выполнения команды морфинга. Возможно стоит именовать папки по имени итерации, а потом давать файлам имена "номер_итерации X количество_промежуточных_кадров"
+else 
+    echo "prev_file='$prev_file' file does not exist, or is empty "; 
+fi;
+
+#File for next iteration
+prev_file="$i";
+iterator=$(($iterator+1));
+done;
+
+#Перемешиваем команды в файле
+#cat "commands.sh" | sort -R > "compose-commands-random.sh"
+#cp "compose-commands-random.sh" "commands.sh"
+rm "compose-commands-random.sh"
+echo "Generate frames";
+sleep 0.05;
+#Выполним команды в несколько потоков
+#cat "commands.sh" 
+tail --lines=2 commands.sh
+echo "Images left to complete: ";
+echo $iterator;
+cat "commands.sh" | xargs -I CMD --max-procs=$threads bash -c CMD
+
+#Rename all morph-files 
+cd "$morph_dir";
+find . -name '*.'${output_format} | sort | gawk 'BEGIN{ a=1 }{ printf "mv \"%s\" %011d.'${output_format}'\n", $0, a++ }' | bash
+cd ..;
+#ToDo: use something like this:
+#find $morph_dir -name '*.jpg' -print0 | sort -z | awk 'BEGIN{ a=0 }{ printf "mv \"%s\" %010d.jpg\n", $0, a++ }' | xargs -r0 bash echo
+
+exit;
+
+

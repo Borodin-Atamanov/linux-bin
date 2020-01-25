@@ -1,0 +1,4 @@
+@reboot sleep 120 && /home/i/bin/swap-start.sh >> /home/i/bin/logs/swap-start.log 2>&1
+47 */5 * * * /home/i/bin/trim-fs.sh
+
+

@@ -1,0 +1,75 @@
+#!/bin/bash 
+#Скрипт преобразует все файлы в текущей директории в jpeg, 
+#Изменяет размеры на 3840x2160
+#Авто-уровни
+#Добавляет имя файла в exif
+NEWDIR="jpeg4k"; 
+mkdir -pv "${NEWDIR}"; 
+#TESTDIR="jpeg4ktest"; 
+#mkdir -pv "${TESTDIR}"; 
+
+calc(){ awk "BEGIN { print "$*" }"; }
+
+for i in *.*; do echo $i; 
+
+#convert "$i" -antialias -resize 3840x2160 -auto-level -interlace plane -background white -quality 100 -flatten ${NEWDIR}/"${i%.*}.jpg"; 
+
+#convert "$i" -antialias -resize 3840x2160 -colorspace sRGB -auto-level -interlace plane -background white -quality 93  -sampling-factor 2x2 -flatten -define jpeg:dct-method=float ${NEWDIR}/"${i%.*}.jpg"; 
+#ffmpeg -hide_banner -y -i "$i" -max_muxing_queue_size 4096 -vf pp=ac/dr/ha/va -frames:v 1 -qscale:v 0 "${NEWDIR}/${i%.*}.png"
+
+# -colorspace YCbCr -colorspace sRGB
+#convert "${NEWDIR}/${i%.*}.png"
+# 3840x2160 
+# 7680x4320 
+# -unsharp 10x4+1+0
+# -unsharp 0x4+1+0
+# -unsharp 0x10+0.42+0.05 
+convert "${i}" -verbose -antialias -adaptive-resize 3840x2160 -colorspace YCbCr -interlace plane -background white -quality 94 -sampling-factor 2x2 -flatten -define jpeg:dct-method=float "${NEWDIR}/${i%.*}.jpg"; 
+
+#convert "$i" -antialias -resize 3840x2160 -auto-level -interlace plane -background white -quality 95 -colorspace YUV -sampling-factor 1x1 -flatten ${TESTDIR}/"${i%.*}-yuv444p.jpg"; 
+
+#set original creation date to new files
+touch -r "${i}" "${NEWDIR}/${i%.*}.jpg"
+
+#set date from file name to its creation date
+#Work with filenames like "2019-06-08-09-22-03--1118ms-1.jpg"
+#convert it to "YYYY-MM-DD HH:mm:ss" format
+filedate="${i:0:4}-${i:5:2}-${i:8:2} ${i:11:2}:${i:14:2}:${i:17:2}";
+#filedate="2019-05-13 15:46:23";
+#echo "date = ${filedate}";
+#filedate=${filedate//-/ }
+touch -a -m --date="${filedate}" "${NEWDIR}/${i%.*}.jpg"
+
+done; 
+#-colorspace YUV -sampling-factor 4:2:0 
+
+cd "${NEWDIR}"; 
+
+#echo "Next step is jpeg optimisation"
+#jpegoptim *.* --preserve --all-progressive --totals --verbose -m95;
+
+exiftool -Artist='Borodin-Atamanov.ru' -Copyright='Borodin-Atamanov.ru©' -By-line='Borodin-Atamanov.ru' -Credit='Borodin-Atamanov.ru' -Contact='photos@Borodin-Atamanov.ru' '-xmp-xmprights:marked=1' -overwrite_original .
+
+#set date from file name to its creation date
+#Work with filenames like "2019-06-08-09-22-03--1118ms-1.jpg"
+#convert it to "YYYY-MM-DD HH:mm:ss" format
+for i in *.*; do echo $i; 
+filedate="${i:0:4}-${i:5:2}-${i:8:2} ${i:11:2}:${i:14:2}:${i:17:2}"; 
+datesecs=$(date +%s --date="${filedate}")
+#2019-08-11-14-10-31--482827ms-11
+dateoffsetsecs=${i:21:9}
+#get only digits from variable
+dateoffsetsecs=$(echo ${dateoffsetsecs} | grep -o -E '[0-9]+' | head -1 | sed -e 's/^0\+//')
+echo "dateoffsetsecs = ${dateoffsetsecs}";
+dateoffsetsecs=$((dateoffsetsecs / 1000));
+#dateoffsetsecs=`calc "${dateoffsetsecs} / 1000"`;
+echo "dateoffsetsecs = ${dateoffsetsecs}";
+datesecs=$((datesecs + dateoffsetsecs));
+echo "datesecs = ${datesecs}";
+filedate=$(date '+%F %H:%M:%S' --date="@${datesecs}")
+echo "date = ${filedate}";
+touch -a -m --date="${filedate}" "${i}";
+done;
+
+
+cd "..";

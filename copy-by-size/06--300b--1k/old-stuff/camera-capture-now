@@ -1,0 +1,24 @@
+#!/bin/bash
+ffmpeg_alternative=/home/i/bin/ffmpeg/ffmpeg
+#Сделать снимок каждой web-камерой
+#Сделать снимок экрана
+
+#echo "" > commands.bash;
+
+sleeptime="0.15";
+function execute_comm {
+    sleeptime="0.1";
+    echo -e "\n\nExecute '$1'";
+    sleep $sleeptime;
+    #echo "$1" >> commands.bash;
+    sleep $sleeptime;
+    echo "";
+    eval "$1";
+}
+
+
+execute_comm " ";
+
+#
+execute_comm "ffmpeg -y -f video4linux2 -i /dev/video0 -vframes 1 -vf pp=ac/al\|fullyrange/dr/ha/va,unsharp -q:v 0 img2.jpg"
+

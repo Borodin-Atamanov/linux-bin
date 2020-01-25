@@ -1,0 +1,62 @@
+#!/bin/bash
+if [ -n "$1" ]
+then
+echo Processing file [$1].
+sleep 0.5;
+else
+echo "No parameters found. Argument 1 must be a movie file name."
+fi
+
+
+BASEFILE="$1";
+
+#Папка для логов и текстовых файлов
+LOGSDIR="${BASEFILE%.*}/logs";
+SRTDIR="${BASEFILE%.*}/srt";
+mkdir  -p "$LOGSDIR"
+mkdir  -p "$SRTDIR"
+
+
+OUTFILE="${BASEFILE%.*}/${BASEFILE%.*}";
+
+#date +%Y-%m-%d-%H-%M-%S > `date +%Y-%m-%d-%H-%M-%S`.start.$1
+#ffmpeg -i "$1" 2>&1 | tee "`date +%Y-%m-%d-%H-%M-%S`.start.$1.txt"
+
+
+#Функция выполяет полученную комманду, выводит её в стандартный вывод и сохраняет в файл
+function doitnow {
+	echo '==== EVAL ====';
+	echo $1 | tee --append "$LOGSDIR/command.txt";
+	eval "$1";
+}
+
+#Параметры кодирования ffmpeg
+FFSTARTPARAMS=" -fflags +genpts ";
+FFPARAMS="  -y -loglevel 27 -stats -c:all copy -vcodec copy -acodec copy -map 0:a  -map 0:v -map 0:s? -movflags +faststart ";
+
+#Получаем информацию о исходном медиа-файле
+doitnow "nohup ffprobe -v error -show_entries stream=index,codec_name,codec_type \"$BASEFILE\" | tee --append \"$LOGSDIR/mediainfo.txt\"&";
+ffmpeg -i "$1" 2>&1 | tee --append "$LOGSDIR/mediainfo.txt";
+
+#Вырезаем субтитры в отдельные файлы в цикле
+for i in `seq 0 15`; \
+do \
+#Создаём папки для каждого из каналов субтитров
+mkdir -p "$SRTDIR/$i";
+#Сохраняем субтитры, ждём 125 секунд, удаляем папку, если она оказалась пустой
+doitnow "(nohup ffmpeg -i \"$BASEFILE\" -loglevel 27 -stats -an -vn -map 0:s:$i \"$SRTDIR/${BASEFILE%.*}-$i.srt\" >> \"$LOGSDIR/srt-$i.txt\"; sleep 125; rm -d \"$SRTDIR/$i\"; sleep 5; rm -d \"$SRTDIR\";)&";
+done;
+
+#Запускаем отдельную команду для создания каждого кусочка видео
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 00:00:00 -t 00:14:01 \"$OUTFILE-01.mkv\" > \"$LOGSDIR/01.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 00:14:00 -t 00:14:01 \"$OUTFILE-02.mkv\" > \"$LOGSDIR/02.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 00:28:00 -t 00:14:01 \"$OUTFILE-03.mkv\" > \"$LOGSDIR/03.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 00:42:00 -t 00:14:01 \"$OUTFILE-04.mkv\" > \"$LOGSDIR/04.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 00:56:00 -t 00:14:01 \"$OUTFILE-05.mkv\" > \"$LOGSDIR/05.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 01:10:00 -t 00:14:01 \"$OUTFILE-06.mkv\" > \"$LOGSDIR/06.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 01:24:00 -t 00:14:01 \"$OUTFILE-07.mkv\" > \"$LOGSDIR/07.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 01:38:00 -t 00:14:01 \"$OUTFILE-08.mkv\" > \"$LOGSDIR/08.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 01:52:00 -t 00:14:01 \"$OUTFILE-09.mkv\" > \"$LOGSDIR/09.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 02:06:00 -t 00:14:01 \"$OUTFILE-10.mkv\" > \"$LOGSDIR/10.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 02:20:00 -t 00:14:01 \"$OUTFILE-11.mkv\" > \"$LOGSDIR/11.txt\"&";
+doitnow "nohup ffmpeg $FFSTARTPARAMS -i \"$BASEFILE\" $FFPARAMS -ss 02:34:00 -t 09:14:01 \"$OUTFILE-12.mkv\" > \"$LOGSDIR/12.txt\"&";

@@ -1,0 +1,26 @@
+#!/bin/bash
+#СКРИПТ ПОКА НЕ РАБОТАЕТ!
+sleep 0.5;
+#preffix=$1; 
+
+#type f -print0 | xargs -0 -I {} rename 's/\.([^.]+)$/.\L$1/gi' "{}"
+#find . -maxdepth 1 -type f -print0 | xargs -0n 1 bash -c 'echo rename \'s/\.'([^.]+')$/.\L$1/gi\' \'{}\' '
+sleep 10000000; find . -type f -maxdepth 1 -print0 | xargs -0n 1 bash -c 'f=$(dirname "$0")/$(basename "$0"); n=$(basename "$0"); n="${n:0:4}-${n:4:2}-${n:6:2}-${n:9:2}-${n:11:2}-${n:13:2}---$n"; n=$(dirname "$0")/$n; if [ "$f" != "$n" ]; then mv --verbose --no-clobber --no-target-directory "$f" "$n"; echo mv -v \"$n\" \"$f\" >>anti.mv; else echo " -- skipping \"$f\"" >/dev/null; fi; chmod +x anti.mv; '
+if [[ "$f" = *.* ]]; then
+    # Extract the basename
+    b="${f%.*}"
+
+    # Extract the extension
+    x="${f##*.}"
+
+    # Convert the extension to lower case
+    # Note: this only works in recent versions of Bash
+    l="${x,,}"
+
+    if [[ "$x" != "$l" ]]; then
+        mv "$f" "$b.$l"
+    fi
+else
+    continue
+fi
+    
