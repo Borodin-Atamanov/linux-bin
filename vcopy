@@ -45,7 +45,7 @@ do echo -e "\n\nMIN_SIZE=${MIN_SIZE} MAX_SIZE=${MAX_SIZE}\n\n";
         SIZE_DIR="${PREFFIX}--${MIN_SIZE}--${MAX_SIZE}"; 
         TARGET_DIR="${TO}/${SIZE_DIR}"; 
     else
-        TARGET_DIR="${to}";
+        TARGET_DIR="${TO}";
     fi;
 
     #echo -e "\n\nMIN_SIZE=${MIN_SIZE} MAX_SIZE=${MAX_SIZE}\n\n";
