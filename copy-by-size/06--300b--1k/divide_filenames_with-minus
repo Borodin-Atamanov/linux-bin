@@ -1,5 +1,0 @@
-#!/bin/bash
-#Script rename files from '20190530T140447.ogg' -> '2019-05-30-14-04-47.ogg'
-sleep 0.31; find . -type f -maxdepth 1 -print0 | xargs -0n 1 bash -c 'f=$(dirname "$0")/$(basename "$0"); n=$(basename "$0"); n="${n:0:4}-${n:4:2}-${n:6:2}-${n:9:2}-${n:11:2}-${n:13:2}${n:15:1024}"; n=$(dirname "$0")/$n; if [ "$f" != "$n" ]; then mv --verbose --no-clobber --no-target-directory "$f" "$n"; echo mv -v \"$n\" \"$f\" >>antiminus.mv; else echo " -- skipping \"$f\"" >/dev/null; fi; chmod +x antiminus.mv; '
-
-
