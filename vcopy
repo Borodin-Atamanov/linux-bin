@@ -28,7 +28,7 @@ fi
 if [ -z "$2" ]
     then
     COPY_TO_SAME_DIR=1;
-    TO=$(pwd); TO="${TO}/${COPY_BY_SIZE_DIR}";
+    TO=$(pwd); TO="${TO}/${COPY_BY_SIZE_DIR}/";
     EXCLUDE=" ${EXCLUDE} --exclude=\"${COPY_BY_SIZE_DIR}\" ";
     echo "Second argument is a \"to\"-directory and it is empty string"
     echo "to-directory set to current dir (${TO})";
@@ -43,9 +43,9 @@ do echo -e "\n\nMIN_SIZE=${MIN_SIZE} MAX_SIZE=${MAX_SIZE}\n\n";
         j=$((j+1)); 
         PREFFIX=`printf "%02d" $j`; 
         SIZE_DIR="${PREFFIX}--${MIN_SIZE}--${MAX_SIZE}"; 
-        TARGET_DIR="${FROM}/${SIZE_DIR}"; 
+        TARGET_DIR="${FROM}/${COPY_BY_SIZE_DIR}/${SIZE_DIR}/"; 
     else
-        TARGET_DIR="${TO}";
+        TARGET_DIR="${TO}/";
     fi;
 
     #echo -e "\n\nMIN_SIZE=${MIN_SIZE} MAX_SIZE=${MAX_SIZE}\n\n";
