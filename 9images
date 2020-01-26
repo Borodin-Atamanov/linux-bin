@@ -29,6 +29,9 @@ echo -ne "Processing \"${input}\" ";
 mkdir -p "$temp_dir";
 mkdir -p "$out_dir";
 echo -ne ".";
+
+if [ "${images}" != "0" ];
+then
 #Create new images
 convert "${input}" -verbose -antialias -interlace plane -quality 100 -rotate 180  "${temp_dir}/rot180.png";
 echo -ne ".";
@@ -36,6 +39,7 @@ convert "${input}" -verbose -antialias -interlace plane -quality 100 -flip "${te
 echo -ne ".";
 convert "${input}" -verbose -antialias -interlace plane -quality 100 -flop "${temp_dir}/flop.png";
 echo -ne ".";
+fi;
 
 rot180="${temp_dir}/rot180.png";
 flip="${temp_dir}/flip.png";
@@ -60,41 +64,42 @@ output2oh="${out_dir}${input%.*}-${images}imagesoh.${format}";
 
 echo -n "${images} x images "
 case $images in
-  '9')
-    #Montage images from 9 parts
-    montage "$rot180" "$flip" "$rot180" "$flop" "$orig" "$flop" "$rot180" "$flip" "$rot180" -verbose -tile 3x3 -geometry +0+0 -quality 100 "$output";
+    '0')
+        #Montage images from 1 parts to circle
+        convert "$orig"  -verbose -virtual-pixel Tile -background white -distort Arc 360 -quality 100 "$output";
+    ;;
+    
+    '2')
+        #Montage images from 2 parts
+        montage "$orig" "$flop" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2v";
+        montage "$orig" "$flip" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2h";
+
+        montage "$flop" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2vi";
+        montage "$flip" "$orig"  -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2hi";
+
+        #montage "$orig" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2ov";
+        #montage "$orig" "$orig" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2oh";
+    ;;
+    
+    '4')
+        #Montage images from 4 parts
+        montage "$rot180" "$flip" "$flop" "$orig" -verbose -tile 2x2 -geometry +0+0 -quality 100 "$output";
+
+        convert "$orig"  -crop 50%x50% +repage "$output4a";
+        montage \
+        \( -flip -flop "$output4a0" \) \( -flip "$output4a0" \) \( -flip "$output4a1" \) \( -flip -flop "$output4a1" \) \
+        \( -flop "$output4a0" \) "$output4a0" "$output4a1" \( -flop "$output4a1" \) \
+        \( -flop "$output4a2" \) "$output4a2" "$output4a3" \( -flop "$output4a3" \) \
+        \( -flip -flop "$output4a2" \)  \( -flip "$output4a2" \) \( -flip "$output4a3" \) \( -flip -flop "$output4a3" \) \
+        -verbose -tile 4x4 -geometry +0+0 -quality 100 "$output4b";
     ;;
 
-  '4')
-    #Montage images from 4 parts
-    montage "$rot180" "$flip" "$flop" "$orig" -verbose -tile 2x2 -geometry +0+0 -quality 100 "$output";
-    #composite -quality 100 -gravity center "$orig" "$output" "$output4a"; 
-    convert "$orig"  -crop 50%x50% +repage "$output4a";
-    montage \
-    \( -flip -flop "$output4a0" \) \( -flip "$output4a0" \) \( -flip "$output4a1" \) \( -flip -flop "$output4a1" \) \
-    \( -flop "$output4a0" \) "$output4a0" "$output4a1" \( -flop "$output4a1" \) \
-    \( -flop "$output4a2" \) "$output4a2" "$output4a3" \( -flop "$output4a3" \) \
-    \( -flip -flop "$output4a2" \)  \( -flip "$output4a2" \) \( -flip "$output4a3" \) \( -flip -flop "$output4a3" \) \
-    -verbose -tile 4x4 -geometry +0+0 -quality 100 "$output4b";
+    '9')
+        #Montage images from 9 parts
+        montage "$rot180" "$flip" "$rot180" "$flop" "$orig" "$flop" "$rot180" "$flip" "$rot180" -verbose -tile 3x3 -geometry +0+0 -quality 100 "$output";
     ;;
 
-  '2')
-    #Montage images from 2 parts
-    montage "$orig" "$flop" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2v";
-    montage "$orig" "$flip" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2h";
-
-    montage "$flop" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2vi";
-    montage "$flip" "$orig"  -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2hi";
-
-    #montage "$orig" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2ov";
-    #montage "$orig" "$orig" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2oh";
-    ;;
-  '0')
-    #Montage images from 1 parts to circle
-    convert "$orig" -virtual-pixel Tile -background white -distort Arc 360  "$output";
-    ;;
-
-  *)
+    *)
     ;;
 esac
 
