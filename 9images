@@ -89,6 +89,10 @@ case $images in
     #montage "$orig" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2ov";
     #montage "$orig" "$orig" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2oh";
     ;;
+  '0')
+    #Montage images from 1 parts to circle
+    convert "$orig" -virtual-pixel Tile -background white -distort Arc 360  "$output";
+    ;;
 
   *)
     ;;
