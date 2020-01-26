@@ -55,11 +55,13 @@ do echo -e "\n\nMIN_SIZE=${MIN_SIZE} MAX_SIZE=${MAX_SIZE}\n\n";
     COMMAND=$(echo "rsync --min-size=${MIN_SIZE} --max-size=${MAX_SIZE} --info=progress2 --progress --recursive --times --human-readable --verbose ${EXCLUDE} \"${FROM}\" \"${TARGET_DIR}\";");
     execute_comm "$COMMAND";
     #if MIN_SIZE is not 0 - delete all empty folders and files
-    if [ "${MIN_SIZE}" != "0" ]
+    if [ "${COPY_TO_SAME_DIR}" == "1" ] && [ "${MIN_SIZE}" != "0" ]
     then
-        COMMAND=$(echo "find \"${TARGET_DIR}\" -empty -type f -exec rm -v '{}' \;");
+        #COMMAND=$(echo "find \"${TARGET_DIR}\" -empty -type f -exec rm -v '{}' \;");
+        COMMAND=$(echo "find \"${TARGET_DIR}\" -empty -type f -print -delete;");
         execute_comm "$COMMAND";
-        COMMAND=$(echo "find \"${TARGET_DIR}\" -empty -type d -exec rmdir -v '{}' \;");
+        #COMMAND=$(echo "find \"${TARGET_DIR}\" -empty -type d -exec rmdir -v '{}' \;");
+        COMMAND=$(echo "find \"${TARGET_DIR}\" -empty -type d -print -delete;");
         execute_comm "$COMMAND";
     fi;
     
