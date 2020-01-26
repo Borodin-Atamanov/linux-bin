@@ -1,0 +1,27 @@
+#!/bin/bash
+#Script makes 9 times bigger images from 1 input image. Creates mirror parts from original images. Uses imagemagic
+
+input="$1";
+temp_dir="9images-temp-${RANDOM}/";
+
+if [ -s "${imput}" ]
+then 
+    echo 'First argument must be a input image file, but it is not'
+    exit;
+fi;
+
+mkdir -pv "$temp_dir";
+echo -ne ".";
+#Create new images
+convert "${input}" -antialias -interlace plane -quality 100 -rotate 180  "${temp_dir}/rot180.png";
+echo -ne ".";
+convert "${input}" -antialias -interlace plane -quality 100 -flip "${temp_dir}/flip.png";
+echo -ne ".";
+convert "${input}" -antialias -interlace plane -quality 100 -flop "${temp_dir}/flop.png";
+echo -ne ".";
+
+#Montage images into 9 parts
+montage "${temp_dir}/rot180.png" "${temp_dir}/flip.png" "${temp_dir}/rot180.png" "${temp_dir}/flop.png" "${input}" "${temp_dir}/flop.png" "${temp_dir}/rot180.png" "${temp_dir}/flip.png" "${temp_dir}/rot180.png"  -tile 3x3 -geometry +0+0 -quality 100 ${input%.*}-9images.jpg;
+echo -ne ".";
+
+rm -rfv "${temp_dir}";
