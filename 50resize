@@ -1,0 +1,33 @@
+#!/bin/bash
+#Script resizes images to 50% from original sizes. Uses imagemagic
+
+input="$1";
+temp_dir="50resizer-temp-${RANDOM}/";
+
+#&& 
+#if [ ! -z ${imput} ] 
+if [ ! -s "$input" ]; 
+then 
+    echo "First argument '$input' must be a input image file, but it is not "
+    echo "Lets process all current directory"
+    for i in *.*g; 
+        do echo -e "\n$i: ";
+        eval "$0 \"${i}\"";
+    done;
+    echo "";
+    exit;
+fi;
+
+echo -ne "Processing \"${input}\" ";
+mkdir -p "$temp_dir";
+output="${input%.*}-50p.jpg";
+echo -ne ".";
+NSIZE='640x360!'; 
+NSIZE='50%x50%'; 
+
+convert "${input}" -verbose -antialias -adaptive-resize "${NSIZE}" -interlace plane -background white -quality 100 -flatten "${output}"; done;
+
+echo -ne ".";
+
+rm -rfv "${temp_dir}";
+echo "";

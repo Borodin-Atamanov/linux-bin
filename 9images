@@ -1,8 +1,13 @@
 #!/bin/bash
 #Script makes 9 times bigger images from 1 input image. Creates mirror parts from original images. Uses imagemagic
 
+script_self=$(basename $0);
+echo $script_self;
+images=${script_self:0:1}
+
+#exit;
 input="$1";
-temp_dir="9images-temp-${RANDOM}/";
+temp_dir="${images}images-temp-${RANDOM}/";
 
 #&& 
 #if [ ! -z ${imput} ] 
@@ -14,8 +19,7 @@ then
         do echo -e "\n$i: ";
         eval "$0 \"${i}\"";
     done;
-
-    echo -e "\n";
+    echo "";
     exit;
 fi;
 
@@ -23,15 +27,50 @@ echo -ne "Processing \"${input}\" ";
 mkdir -p "$temp_dir";
 echo -ne ".";
 #Create new images
-convert "${input}" -antialias -interlace plane -quality 100 -rotate 180  "${temp_dir}/rot180.png";
+convert "${input}" -verbose -antialias -interlace plane -quality 100 -rotate 180  "${temp_dir}/rot180.png";
 echo -ne ".";
-convert "${input}" -antialias -interlace plane -quality 100 -flip "${temp_dir}/flip.png";
+convert "${input}" -verbose -antialias -interlace plane -quality 100 -flip "${temp_dir}/flip.png";
 echo -ne ".";
-convert "${input}" -antialias -interlace plane -quality 100 -flop "${temp_dir}/flop.png";
+convert "${input}" -verbose -antialias -interlace plane -quality 100 -flop "${temp_dir}/flop.png";
 echo -ne ".";
 
-#Montage images into 9 parts
-montage "${temp_dir}/rot180.png" "${temp_dir}/flip.png" "${temp_dir}/rot180.png" "${temp_dir}/flop.png" "${input}" "${temp_dir}/flop.png" "${temp_dir}/rot180.png" "${temp_dir}/flip.png" "${temp_dir}/rot180.png"  -tile 3x3 -geometry +0+0 -quality 100 ${input%.*}-9images.jpg;
+rot180="${temp_dir}/rot180.png";
+flip="${temp_dir}/flip.png";
+flop="${temp_dir}/flop.png";
+orig="${input}";
+output="${input%.*}-${images}images.jpg";
+output2v="${input%.*}-${images}imagesv.jpg";
+output2h="${input%.*}-${images}imagesh.jpg";
+output2ov="${input%.*}-${images}imagesov.jpg";
+output2oh="${input%.*}-${images}imagesoh.jpg";
+
+echo -n "${images} x images "
+case $images in
+
+  '9')
+    #Montage images from 9 parts
+    montage "$rot180" "$flip" "$rot180" "$flop" "$orig" "$flop" "$rot180" "$flip" "$rot180" -verbose -tile 3x3 -geometry +0+0 -quality 100 "$output";
+    ;;
+
+  '4')
+    #Montage images from 4 parts
+    montage "$rot180" "$flip" "$flop" "$orig" -verbose -tile 2x2 -geometry +0+0 -quality 100 "$output";
+    ;;
+
+  '2')
+    #Montage images from 2 parts
+    montage "$orig" "$flop" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2v";
+    montage "$orig" "$flip" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2h";
+    montage "$orig" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2ov";
+    montage "$orig" "$orig" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2oh";
+    ;;
+
+  *)
+    ;;
+esac
+
+
+
 echo -ne ".";
 
 rm -rfv "${temp_dir}";
