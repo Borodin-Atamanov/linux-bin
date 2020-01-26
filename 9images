@@ -68,8 +68,8 @@ case $images in
     montage "$flop" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2vi";
     montage "$flip" "$orig"  -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2hi";
 
-    montage "$orig" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2ov";
-    montage "$orig" "$orig" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2oh";
+    #montage "$orig" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2ov";
+    #montage "$orig" "$orig" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2oh";
     ;;
 
   *)
