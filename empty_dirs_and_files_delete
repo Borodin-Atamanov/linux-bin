@@ -2,14 +2,18 @@
 #Script delete empty dirs and files
 echo "Script delete empty dirs and files"
 sleep 0.1;
-find . -empty -type f -exec rm -v '{}' \;  
+find . -empty -type f -print -delete;  
 sleep 0.1;
-find . -empty -type d -exec rmdir -v '{}' \;
+find . -empty -type d -print -delete;
 sleep 0.1;
-find . -empty -type d -exec rmdir -v '{}' \;
+find . -empty -type d -print -delete;
 sleep 0.1;
-find . -name "Thumbs.db:encryptable" -exec rm -v '{}' \; 
+find . -empty -type d -print -delete;
 sleep 0.1;
-find . -name "Thumbs.db" -exec rm -v '{}' \;
+find . -name "Thumbs.db:encryptable" -print -delete; 
+sleep 0.1;
+find . -name "Thumbs.db" -print -delete;
+
+
 
 
