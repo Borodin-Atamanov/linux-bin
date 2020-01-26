@@ -15,7 +15,7 @@ datesecs=$(date +%s --date="${filedate}")
 dateoffsetsecs=${i:21:9}
 #get only digits from variable
 dateoffsetsecs=$(echo ${dateoffsetsecs} | grep -o -E '[0-9]+' | head -1 | sed -e 's/^0\+//')
-echo -n "dateoffsetsecs = ${dateoffsetsecs} ";
+echo -n "dateoffsetmicrosecs = ${dateoffsetsecs} ";
 dateoffsetsecs=$((dateoffsetsecs / 1000));
 #dateoffsetsecs=`calc "${dateoffsetsecs} / 1000"`;
 echo -n "dateoffsetsecs = ${dateoffsetsecs} ";
