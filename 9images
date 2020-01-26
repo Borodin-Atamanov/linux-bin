@@ -41,6 +41,8 @@ orig="${input}";
 output="${input%.*}-${images}images.jpg";
 output2v="${input%.*}-${images}imagesv.jpg";
 output2h="${input%.*}-${images}imagesh.jpg";
+output2vi="${input%.*}-${images}imagesvi.jpg";
+output2hi="${input%.*}-${images}imageshi.jpg";
 output2ov="${input%.*}-${images}imagesov.jpg";
 output2oh="${input%.*}-${images}imagesoh.jpg";
 
@@ -61,6 +63,10 @@ case $images in
     #Montage images from 2 parts
     montage "$orig" "$flop" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2v";
     montage "$orig" "$flip" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2h";
+
+    montage "$flop" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2vi";
+    montage "$flip" "$orig"  -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2hi";
+
     montage "$orig" "$orig" -verbose -tile 2x1 -geometry +0+0 -quality 100 "$output2ov";
     montage "$orig" "$orig" -verbose -tile 1x2 -geometry +0+0 -quality 100 "$output2oh";
     ;;
