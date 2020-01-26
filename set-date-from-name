@@ -8,7 +8,7 @@
 
 #for i in *.*; do echo $i; filedate="${i:0:4}-${i:5:2}-${i:8:2} ${i:11:2}:${i:14:2}:${i:17:2}"; echo "date = ${filedate}"; touch -a -m --date="${filedate}" "${i}"; done;
 
-for i in *.*; do echo -e "\n$i"; 
+for i in *.*; do echo -ne "\n$i "; 
 filedate="${i:0:4}-${i:5:2}-${i:8:2} ${i:11:2}:${i:14:2}:${i:17:2}"; 
 datesecs=$(date +%s --date="${filedate}")
 #2019-08-11-14-10-31--482827ms-11
