@@ -43,7 +43,13 @@ flop="${temp_dir}/flop.png";
 orig="${input}";
 
 output="${out_dir}${input%.*}-${images}images.${format}";
+
 output4a="${out_dir}${input%.*}-${images}images4a-%01d.${format}";
+output4a0="${out_dir}${input%.*}-${images}images4a-0.${format}";
+output4a1="${out_dir}${input%.*}-${images}images4a-1.${format}";
+output4a2="${out_dir}${input%.*}-${images}images4a-2.${format}";
+output4a3="${out_dir}${input%.*}-${images}images4a-3.${format}";
+output4b="${out_dir}${input%.*}-${images}images4b.${format}";
 
 output2v="${out_dir}${input%.*}-${images}imagesv.${format}";
 output2h="${out_dir}${input%.*}-${images}imagesh.${format}";
@@ -54,7 +60,6 @@ output2oh="${out_dir}${input%.*}-${images}imagesoh.${format}";
 
 echo -n "${images} x images "
 case $images in
-
   '9')
     #Montage images from 9 parts
     montage "$rot180" "$flip" "$rot180" "$flop" "$orig" "$flop" "$rot180" "$flip" "$rot180" -verbose -tile 3x3 -geometry +0+0 -quality 100 "$output";
@@ -64,7 +69,13 @@ case $images in
     #Montage images from 4 parts
     montage "$rot180" "$flip" "$flop" "$orig" -verbose -tile 2x2 -geometry +0+0 -quality 100 "$output";
     #composite -quality 100 -gravity center "$orig" "$output" "$output4a"; 
-    convert "$orig" -crop 50%x50% +repage "$output4a";
+    convert "$orig"  -crop 50%x50% +repage "$output4a";
+    montage \
+    \( -flip -flop "$output4a0" \) \( -flip "$output4a0" \) \( -flip "$output4a1" \) \( -flip -flop "$output4a1" \) \
+    \( -flop "$output4a0" \) "$output4a0" "$output4a1" \( -flop "$output4a1" \) \
+    \( -flop "$output4a2" \) "$output4a2" "$output4a3" \( -flop "$output4a3" \) \
+    \( -flip -flop "$output4a2" \)  \( -flip "$output4a2" \) \( -flip "$output4a3" \) \( -flip -flop "$output4a3" \) \
+    -verbose -tile 4x4 -geometry +0+0 -quality 100 "$output4b";
     ;;
 
   '2')

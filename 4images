@@ -1,4 +1,5 @@
 #!/bin/bash
 #Script makes 4 times bigger images from 1 input image. Creates mirror parts from original images. Uses imagemagic
 
-. 9images;
+script_path=$(dirname "$0")/
+. ${script_path}9images;
