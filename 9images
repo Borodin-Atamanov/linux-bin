@@ -99,5 +99,9 @@ esac
 echo -ne ".";
 
 rm -rfv "${temp_dir}";
+rm -rfv "$output4a0";
+rm -rfv "$output4a1";
+rm -rfv "$output4a2";
+rm -rfv "$output4a3";
 
 echo -e "\n\n\n";
