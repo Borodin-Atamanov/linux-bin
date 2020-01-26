@@ -3,6 +3,8 @@
 
 input="$1";
 temp_dir="50resizer-temp-${RANDOM}/";
+out_dir="50p/";
+
 
 #&& 
 #if [ ! -z ${imput} ] 
@@ -20,7 +22,9 @@ fi;
 
 echo -ne "Processing \"${input}\" ";
 mkdir -p "$temp_dir";
-output="${input%.*}-50p.jpg";
+mkdir -p "$out_dir";
+
+output="${out_dir}${input%.*}-50p.jpg";
 echo -ne ".";
 NSIZE='640x360!'; 
 NSIZE='50%x50%'; 

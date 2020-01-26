@@ -43,6 +43,8 @@ flop="${temp_dir}/flop.png";
 orig="${input}";
 
 output="${out_dir}${input%.*}-${images}images.${format}";
+output4a="${out_dir}${input%.*}-${images}images4a.${format}";
+
 output2v="${out_dir}${input%.*}-${images}imagesv.${format}";
 output2h="${out_dir}${input%.*}-${images}imagesh.${format}";
 output2vi="${out_dir}${input%.*}-${images}imagesvi.${format}";
@@ -61,6 +63,7 @@ case $images in
   '4')
     #Montage images from 4 parts
     montage "$rot180" "$flip" "$flop" "$orig" -verbose -tile 2x2 -geometry +0+0 -quality 100 "$output";
+    composite -quality 100 -gravity center "$orig" "$output" "$output4a"; 
     ;;
 
   '2')
