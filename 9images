@@ -4,13 +4,23 @@
 input="$1";
 temp_dir="9images-temp-${RANDOM}/";
 
-if [ -s "${imput}" ]
+#&& 
+#if [ ! -z ${imput} ] 
+if [ ! -s "$input" ]; 
 then 
-    echo 'First argument must be a input image file, but it is not'
+    echo "First argument '$input' must be a input image file, but it is not "
+    echo "Lets process all current directory"
+    for i in *.*g; 
+        do echo -e "\n$i: ";
+        eval "$0 \"${i}\"";
+    done;
+
+    echo -e "\n";
     exit;
 fi;
 
-mkdir -pv "$temp_dir";
+echo -ne "Processing \"${input}\" ";
+mkdir -p "$temp_dir";
 echo -ne ".";
 #Create new images
 convert "${input}" -antialias -interlace plane -quality 100 -rotate 180  "${temp_dir}/rot180.png";
@@ -25,3 +35,5 @@ montage "${temp_dir}/rot180.png" "${temp_dir}/flip.png" "${temp_dir}/rot180.png"
 echo -ne ".";
 
 rm -rfv "${temp_dir}";
+
+echo -e "\n\n\n";
