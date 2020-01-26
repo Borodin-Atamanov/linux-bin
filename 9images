@@ -9,6 +9,7 @@ images=${script_self:0:1}
 #exit;
 input="$1";
 temp_dir="${images}images-temp-${RANDOM}/";
+out_dir="xmages/";
 
 #&& 
 #if [ ! -z ${imput} ] 
@@ -26,6 +27,7 @@ fi;
 
 echo -ne "Processing \"${input}\" ";
 mkdir -p "$temp_dir";
+mkdir -p "$out_dir";
 echo -ne ".";
 #Create new images
 convert "${input}" -verbose -antialias -interlace plane -quality 100 -rotate 180  "${temp_dir}/rot180.png";
@@ -39,13 +41,14 @@ rot180="${temp_dir}/rot180.png";
 flip="${temp_dir}/flip.png";
 flop="${temp_dir}/flop.png";
 orig="${input}";
-output="${input%.*}-${images}images.${format}";
-output2v="${input%.*}-${images}imagesv.${format}";
-output2h="${input%.*}-${images}imagesh.${format}";
-output2vi="${input%.*}-${images}imagesvi.${format}";
-output2hi="${input%.*}-${images}imageshi.${format}";
-output2ov="${input%.*}-${images}imagesov.${format}";
-output2oh="${input%.*}-${images}imagesoh.${format}";
+
+output="${out_dir}${input%.*}-${images}images.${format}";
+output2v="${out_dir}${input%.*}-${images}imagesv.${format}";
+output2h="${out_dir}${input%.*}-${images}imagesh.${format}";
+output2vi="${out_dir}${input%.*}-${images}imagesvi.${format}";
+output2hi="${out_dir}${input%.*}-${images}imageshi.${format}";
+output2ov="${out_dir}${input%.*}-${images}imagesov.${format}";
+output2oh="${out_dir}${input%.*}-${images}imagesoh.${format}";
 
 echo -n "${images} x images "
 case $images in
