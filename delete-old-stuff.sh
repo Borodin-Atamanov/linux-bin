@@ -3,7 +3,7 @@
 cur_log_file_path="/home/i/bin/logs/delete-old-stuff-last.log";
 all_log_file_path="/home/i/bin/logs/delete-old-stuff-all.log";
 #Насколько старые файлы будут удалены (количество дней)
-how_many_days="+7";
+how_many_days="+3";
 
 function find_and_delete () {
     #function deletes old files from directory "${1}"
