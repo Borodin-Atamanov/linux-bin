@@ -52,7 +52,7 @@ do echo -e "\n\nMIN_SIZE=${MIN_SIZE} MAX_SIZE=${MAX_SIZE}\n\n";
     mkdir -pv "${TARGET_DIR}"; 
     #sleep 0.1; 
     #rsync --min-size=${MIN_SIZE} --max-size=${MAX_SIZE} --info=progress2 --progress --recursive --times --human-readable --verbose "${EXCLUDE}" "${FROM}/" "${TO}/"; MIN_SIZE=$MAX_SIZE; 
-    COMMAND=$(echo "rsync --min-size=${MIN_SIZE} --max-size=${MAX_SIZE} --info=progress2 --progress --recursive --times --human-readable --verbose ${EXCLUDE} \"${FROM}\" \"${TARGET_DIR}\";");
+    COMMAND=$(echo "rsync --min-size=${MIN_SIZE} --max-size=${MAX_SIZE} --info=progress2 --progress --recursive --times --human-readable --verbose --copy-links ${EXCLUDE} \"${FROM}\" \"${TARGET_DIR}\";");
     execute_comm "$COMMAND";
     #if MIN_SIZE is not 0 - delete all empty folders and files
     if [ "${COPY_TO_SAME_DIR}" == "1" ] && [ "${MIN_SIZE}" != "0" ]
