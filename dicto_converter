@@ -4,6 +4,19 @@ ffmpeg_alternative=/home/i/bin/ffmpeg/ffmpeg
 
 #echo "" > commands.bash;
 
+input="$1";
+if [ ! -s "$input" ]; 
+then 
+    echo "First argument '$input' must be a input image file, but it is not "
+    echo "Lets process all current directory"
+    for i in *.*; 
+        do echo -e "\n$i: ";
+        eval "$0 \"${i}\"";
+    done;
+    echo "";
+    exit;
+fi;
+
 sleeptime="0.15";
 function execute_comm {
     sleeptime="0.1";
@@ -24,8 +37,7 @@ sleep 0.1;
 
 rm -v "commands.bash";
 
-for i in *.*; 
-do echo "$i";
+i="$input";
 
 DIR='left-right';
 mkdir -pv "${DIR}";
@@ -151,7 +163,5 @@ sleep 0.1;
 echo "Deleting temp files [$i]"
 sleep 4;
 rm -rfv "${DIR}";
-
-done;
 
 exit;
