@@ -2,6 +2,15 @@
 
 #TODO: Сделать возможным задавать первым аргументом длину создаваемой директории, изменить имя скрипта 
 
+dir_name_size="$1";
+
+re='^[0-9]+$'
+if ! [[ $dir_name_size =~ $re ]] ; then
+   #echo "error: Not a number" >&2; 
+   dir_name_size=10;
+   echo "The first argument may be the number of characters in the subdirectory where the file will be placed. Now it set to default=${dir_name_size}"
+fi
+
 #Файл, позволяющий всё отменить
 echo "#!/bin/bash" >>anti.mv
 echo `date` >>anti.mv
@@ -15,19 +24,24 @@ filenameleng=${#d}
 newfname=`echo $d | tr 'A-Z' 'a-z'`
 
 #Если в имени файла менее X символов - не обрабатываем его
-if (("$filenameleng" >= "15"))
+if (("$filenameleng" > "$dir_name_size"))
 then
-	#echo "#$d lenght:[$filenameleng] - приемлемое имя файла";
-	new_d=${d:0:10};
+    if [ "${d}" == "anti.mv" ];
+    then
+        #Skip anti.mv file
+        continue;
+    fi;	
+	new_d=$(echo ${d} | cut -c1-${dir_name_size})
 	mkdir -p "$new_d";
 	#Создаём жёсткую ссылку
 	#ln "$d" "$new_d/$newfname";
 	#Переносим файл в новое место и показываем команду для обратного переноса
+
 	echo mv \""$new_d/$newfname"\" \""$d"\";
 	echo mv \""$new_d/$newfname"\" \""$d"\" >>anti.mv;
 	mv "$d" "$new_d/$newfname";
 else
-      echo "$d lenght:[$filenameleng] - слишком короткое имя файла";
+      echo "$d lenght:[$filenameleng] - file name is too short";
 fi
 
 done;
