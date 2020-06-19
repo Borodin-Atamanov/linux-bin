@@ -29,7 +29,7 @@ echo -ne ".";
 NSIZE='640x360!'; 
 NSIZE='50%x50%'; 
 
-convert "${input}" -verbose -antialias -adaptive-resize "${NSIZE}" -interlace plane -background white -quality 100 -flatten "${output}"; 
+convert "${input}" -verbose -antialias -resize "${NSIZE}" -interlace plane -background white -quality 100 -flatten "${output}"; 
 
 echo -ne ".";
 
