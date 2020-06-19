@@ -24,7 +24,9 @@ for i in *.*; do echo $i;
 # -unsharp 10x4+1+0
 # -unsharp 0x4+1+0
 # -unsharp 0x10+0.42+0.05 
-convert "${i}" -verbose -antialias -adaptive-resize 3840x2160 -colorspace YCbCr -interlace plane -background white -quality 94 -sampling-factor 2x2 -flatten -define jpeg:dct-method=float "${NEWDIR}/${i%.*}.jpg"; 
+#convert "${i}" -verbose -antialias -adaptive-resize 3840x2160 -colorspace YCbCr -interlace plane -background white -quality 94 -sampling-factor 2x2 -flatten -define jpeg:dct-method=float "${NEWDIR}/${i%.*}.jpg"; 
+#ToDO: use -adaptive-resize for upscale, -resize - for downscale
+convert "${i}" -verbose -antialias -normalize -resize 3840x2160 -colorspace YCbCr -interlace plane -background white -quality 94 -sampling-factor 2x2 -flatten -define jpeg:dct-method=float "${NEWDIR}/${i%.*}.jpg"; 
 
 #convert "$i" -antialias -resize 3840x2160 -auto-level -interlace plane -background white -quality 95 -colorspace YUV -sampling-factor 1x1 -flatten ${TESTDIR}/"${i%.*}-yuv444p.jpg"; 
 
