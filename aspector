@@ -1,0 +1,103 @@
+#!/bin/bash
+#Script resizes to new aspect retio from original sizes. Uses imagemagic
+
+
+
+
+#NEWDIR="liquid-rescaled-bigger2a"; mkdir -pv "${NEWDIR}"; mkdir -pv "computed"; time for i in *.*; do echo $i; /usr/bin/time --format=%e convert "$i" -antialias -normalize -liquid-rescale "158.74%x158.74%" -liquid-rescale "125.9921%x125.9921%" -interlace plane -background white -quality 100 -flatten "${NEWDIR}"/"${i%.*}.png"; mv "$i" "computed/"; done; mv -v computed/* ./;
+
+#calc(){ awk "BEGIN { print "$*" }"; };
+calcer()
+{ 
+#awk "BEGIN { print "$*" }"; 
+echo "$*" | bc -l;
+}; 
+
+#calcer 123/12323
+
+#exit;
+
+if [ -z "$1" ]; then
+    echo -e "\nPlease call '$0 <new_aspect_ratio> <file_name>' to run this script. Aspect ratio can be '16/9', '2', '1', etc,\n"
+    exit 1
+fi
+
+#&& 
+#if [ ! -z ${input} ] 
+if [ ! -s "$2" ]; 
+then 
+    echo "Second argument '$2' must be a input image file, but it is not "
+    echo "Lets process all current directory"
+    for i in *.*g; 
+        do echo -e "\n$i: ";
+        eval "/usr/bin/time --format=%e $0 \"$1\" \"${i}\"";
+    done;
+    echo "";
+    exit;
+fi;
+
+input="$2";
+ext="\*.${input##*.}"; 
+ext=${ext:1}; 
+#echo "${ext}"; 
+#output_format='jpg';
+#output_format='png';
+output_format="${ext:2}";
+
+new_aspect_ratio=`calcer "$1"`;
+new_aspect_ratio_file=`calcer "scale=3; $1"`; 
+#out_dir="aspected-${new_aspect_ratio}"; 
+#out_dir_sm="aspected-sm-${new_aspect_ratio}"; 
+#out_dir_bg="aspected-bg-${new_aspect_ratio}"; 
+out_dir_sm="aspected"; 
+#out_dir_bg="aspected-${new_aspect_ratio}"; 
+mkdir -p "${out_dir_sm}";
+#mkdir -p "${out_dir_bg}";
+
+#echo -ne "Processing \"${input}\" ";
+#echo -ne ".";
+
+f="$2"; 
+imagew=`convert "$2" -format %w info:`; 
+imageh=`convert "$2" -format %h info:`; 
+#echo width=$imagew; 
+#echo height=$imageh; 
+if [ "$imagew" -gt "0" ] && [ "$imageh" -gt "0" ]; 
+then aspect_ratio=`calcer "${imagew}/${imageh}"`; 
+    if (( $(echo "$new_aspect_ratio > $aspect_ratio" | bc -l) )); 
+    then 
+        echo "ar > nar";
+        new_w=`calcer "1*${imagew}"`; 
+        new_h=`calcer "scale=0; ${new_w}/${new_aspect_ratio}"`; 
+    else 
+        echo "ar < nar";
+        new_h=`calcer "1*${imageh}"`; 
+        new_w=`calcer "scale=0; ${new_h}*${new_aspect_ratio}"`; 
+    fi; 
+
+    echo "Smaller: aspect_ratio=$aspect_ratio, new_ar=$new_aspect_ratio, w=$imagew, h=$imageh, new_w=$new_w, new_h=$new_h"; 
+    convert "$f" -verbose -antialias -liquid-rescale "${new_w}x${new_h}!" -quality 100 -interlace plane "${out_dir_sm}/${input%.*}-${new_aspect_ratio_file}sm.${output_format}"; 
+    
+    
+    
+    
+    
+    if (( $(echo "$new_aspect_ratio > $aspect_ratio" | bc -l) )); 
+    then 
+        new_w=`calcer "scale=0; $imageh*$new_aspect_ratio"`; 
+        new_h="${imageh}"; 
+    else 
+        new_w="${imagew}"; 
+        new_h=`calcer "scale=0; $imagew/$new_aspect_ratio"`; 
+    fi; 
+
+    echo "Bigger: aspect_ratio=$aspect_ratio, new_ar=$new_aspect_ratio, w=$imagew, h=$imageh, new_w=$new_w, new_h=$new_h"; 
+    convert "$f" -verbose -antialias -liquid-rescale "${new_w}x${new_h}!" -quality 100 -interlace plane "${out_dir_sm}/${input%.*}-${new_aspect_ratio_file}bg.${output_format}"; 
+    
+else 
+echo "$f is NOT a IMAGE!"; 
+
+fi;
+
+exit;
+
