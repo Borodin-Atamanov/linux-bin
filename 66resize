@@ -22,11 +22,9 @@ fi;
 echo -ne "Processing \"${input}\" ";
 mkdir -p "$out_dir";
 
-output="${out_dir}${input%.*}.png";
 echo -ne ".";
 
-convert "${input}" -verbose -antialias -blur 0x1 -liquid-rescale "66.666%x66.666%" -sharpen 0x2 -interlace plane -quality 100 "${output}"; 
+#convert "${input}" -verbose -antialias -blur 0x1 -liquid-rescale "66.666%x66.666%" -sharpen 0x2 -interlace plane -quality 100 "${output}"; 
+/usr/bin/time --format=%e convert "${input}" -verbose -antialias  -adaptive-resize "200%x200%" -resize "50%x50%" -liquid-rescale "66.666%x66.666%" -interlace plane -quality 100 "${out_dir}${input%.*}.png"; 
+#time convert "${input}" -verbose -antialias -blur 0x1 -liquid-rescale "66.666%x66.666%" -sharpen 0x2 -interlace plane -quality 100 "${out_dir}${input%.*}-blur.png"; 
 
-echo -ne ".";
-
-echo "";
