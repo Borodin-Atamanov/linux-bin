@@ -46,7 +46,7 @@ target_fname_png2="${cur_date}-screen66p.png";
 #target_fname_jpg="$(date "+%F-%H-%M-%S--%N")-screen.jpg";
 execute_comm "timeout --kill-after=9 15 ffmpeg -y -hide_banner -s ${CUR_RESOLUTION} -f x11grab -i :0.0  -vframes 1 \"${screen_dir}/${target_fname_png}\" ";
 echo $target_fname_png; 
-execute_comm "timeout --kill-after=9 123 convert \"${target_fname_png}\" -antialias  -adaptive-resize 200%x200% -resize 50%x50% -liquid-rescale 66.666%x66.666% -adaptive-sharpen 0x0.9 -interlace plane -quality 100 \"${target_fname_png2}\"; ";
+#execute_comm "timeout --kill-after=9 123 convert \"${target_fname_png}\" -antialias  -adaptive-resize 200%x200% -resize 50%x50% -liquid-rescale 66.666%x66.666% -adaptive-sharpen 0x0.9 -interlace plane -quality 100 \"${target_fname_png2}\"; ";
 #execute_comm "convert \"${target_fname_png}\" -antialias -interlace plane -background '#FFFFFF00' -quality 100 -flatten -rotate 0.5 \"${target_fname_png_15}\"";
 #execute_comm "convert \"${screen_dir}/${target_fname_png}\" -verbose -colorspace YCbCr -auto-level -interlace plane -background white -quality 33 -sampling-factor 2x2 -flatten -define jpeg:dct-method=float \"${screen_dir}/${target_fname_jpg}\""
 #execute_comm "rm -vf \"${screen_dir}/${target_fname_png}\""
