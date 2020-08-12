@@ -1,0 +1,22 @@
+#!/bin/bash
+#Script change author in media files, uses exiftool
+
+
+artist="$1";
+#&& 
+#if [ ! -z ${input} ] 
+if [ -z "$1" ]; 
+then 
+    echo "First argument '$1' can be a artist name, but it is not "
+    echo "Lets process all current directory with default artist name"
+    artist="Borodin-Atamanov.ru";
+    for i in *.*; 
+        do echo -e "\n$i: ";
+        #eval "/usr/bin/time --format=%e $0 \"$1\" \"${i}\"";
+        /usr/bin/time --format=%e exiftool -overwrite_original -Artist=${artist} -Copyright=${artist} -By-line=${artist} -Credit=${artist} -Contact=${artist} '-xmp-xmprights:marked=1' "$i";
+    done;
+    exit;
+fi;
+
+
+
