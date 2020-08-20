@@ -87,10 +87,12 @@ else
     AC=2;
 fi
 
+aresample=",aresample=ocl=mono:dither_method=triangular:out_sample_rate=48000:resampler=soxr:filter_type=cubic"
+
 #if left audio file exist - normalize it
 if [ -s "${DIR}/left.wav" ]; 
 then 
-    FFCOMMAND=$(echo "$ffmpeg_alternative -threads $threads -hide_banner -y -i \"${DIR}/left.wav\" -vn -sn -movflags  +faststart -metadata title=\"${i%.*}\" -map_metadata 0 -acodec pcm_s32le -af \"loudnorm=I=-9:dual_mono=true:print_format=summary\" -ar 48000 \"${DIR}/left-norm.wav\" ; ");
+    FFCOMMAND=$(echo "$ffmpeg_alternative -threads $threads -hide_banner -y -i \"${DIR}/left.wav\" -vn -sn -movflags  +faststart -metadata title=\"${i%.*}\" -map_metadata 0 -acodec pcm_s32le -af \"loudnorm=I=-9:dual_mono=true:print_format=summary${aresample}\" \"${DIR}/left-norm.wav\" ; ");
     execute_comm "$FFCOMMAND";
 fi;
 
@@ -102,7 +104,7 @@ fi;
 #if right audio file exist - normalize it
 if [ -s "${DIR}/right.wav" ] && [ "$AC" == 2 ]; 
 then 
-    FFCOMMAND=$(echo "$ffmpeg_alternative -threads $threads -hide_banner -y -i \"${DIR}/right.wav\" -vn -sn -movflags  +faststart -metadata title=\"${i%.*}\" -map_metadata 0 -acodec pcm_s32le -af \"loudnorm=I=-9:dual_mono=true:print_format=summary\" -ar 48000 \"${DIR}/right-norm.wav\" ; ");
+    FFCOMMAND=$(echo "$ffmpeg_alternative -threads $threads -hide_banner -y -i \"${DIR}/right.wav\" -vn -sn -movflags  +faststart -metadata title=\"${i%.*}\" -map_metadata 0 -acodec pcm_s32le -af \"loudnorm=I=-9:dual_mono=true:print_format=summary${aresample}\" \"${DIR}/right-norm.wav\" ; ");
     execute_comm "$FFCOMMAND";
 fi;
 
