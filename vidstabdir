@@ -1,5 +1,5 @@
 #!/bin/bash
-ffmpeg_alternative=/home/i/bin/ffmpeg/ffmpeg
+ffmpeg_alternative=ffmpeg
 
 echo "" > commands.bash;
 
@@ -87,8 +87,8 @@ esac;
 echo -e "\nfile_format = $file_format\n"; 
 sleep $sleeptime;
 
-VERY_LOW_Q_PARAMS=' -c:a  aac  -b:a 128k -c:v libx264 -preset veryfast -crf 24 -profile:v baseline -level 3.0 -ar 48000 -pix_fmt yuv420p'; 
-LOW_Q_PARAMS=' -c:a  aac  -b:a 192k -c:v libx264 -preset veryfast -crf 18 -profile:v baseline -level 3.0 -ar 48000 -pix_fmt yuv420p'; 
+VERY_LOW_Q_PARAMS=' -c:a  aac  -b:a 128k -c:v libx264 -preset veryfast -crf 24 -profile:v baseline -level 3.0 -pix_fmt yuv420p'; 
+LOW_Q_PARAMS=' -c:a  aac  -b:a 192k -c:v libx264 -preset veryfast -crf 18 -profile:v baseline -level 3.0 -pix_fmt yuv420p'; 
 MID_Q_PARAMS=' -acodec copy -c:v libx264 -preset veryfast -crf 12 -profile:v baseline -level 3.0 -pix_fmt yuv420p'; 
 HI_Q_PARAMS=' -acodec copy  -vcodec libx264 -preset veryfast -crf 9 -profile:v high444 -pix_fmt yuv444p '; 
 echo -n -e "\n\nSelect h264 video encode settings:\n0 - Very low quality (for small file size '$VERY_LOW_Q_PARAMS')\n\n\n1 - low quality (good for mobile, default '$LOW_Q_PARAMS')\n\n3 - mid quality ($MID_Q_PARAMS)\n\n5 - high quality (bigger size, low compatibility with mobile devices '$HI_Q_PARAMS')\n\nPress 1 or 5: "; 
@@ -119,7 +119,7 @@ execute_comm "### $i ###"
 DIR='norm'; 
 mkdir -p "norm"; 
 #ffmpeg -threads $threads -hide_banner -n -i "$i" -filter "loudnorm=I=-10" -acodec pcm_s32le "norm*}.wav"; DIR='vidstab'; 
-FFCOMMAND=$(echo "ffmpeg -threads $threads -hide_banner -n -i \"$i\" -filter \"loudnorm=I=-8:dual_mono=true\" -acodec pcm_s32le -ar 48000 \"norm/${i%.*}.wav\"; "); 
+FFCOMMAND=$(echo "ffmpeg -threads $threads -hide_banner -n -i \"$i\" -filter \"loudnorm=I=-9:dual_mono=true,aresample=48000\" -acodec pcm_s32le \"norm/${i%.*}.wav\"; "); 
 execute_comm "$FFCOMMAND";
 
 MAP_COMM=' -map 0:v  ';
