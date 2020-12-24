@@ -11,7 +11,7 @@ function find_and_delete () {
     #find "${1}" -name '*.*' -mtime +30 -exec rm -v {} \ | tee -a "${cur_log_file_path}"; 
     #mkdir -pv "${1}";
     cd "${1}";
-    find "${1}" -mtime ${how_many_days} -type f -exec bash -c "echo \"{}\"; sleep 1.13; rm \"{}\"" \; | tee -a "${cur_log_file_path}"; 
+    find "${1}" -mtime ${how_many_days} -type f -exec bash -c "echo \"{}\"; sleep 0.013; rm \"{}\"" \; | tee -a "${cur_log_file_path}"; 
     find "${1}" -empty -type d -exec bash -c "echo DIR=\"{}\"; sleep 0.13; rmdir \"{}\"" \; | tee -a "${cur_log_file_path}"; 
     #find "${1}" -empty -type d -exec bash -c "echo \"{}\"; sleep 0.33; rmdir {}" \; | tee -a "${cur_log_file_path}"; 
 
@@ -26,7 +26,7 @@ function find_and_move () {
     #find "${1}" -name '*.*' -mtime +30 -exec rm -v {} \ | tee -a "${cur_log_file_path}"; 
     mkdir -p "${2}";
     cd "${1}";
-    find "${1}" -mtime ${how_many_days} -type f -exec bash -c "echo \"{}\"; sleep 1.13; mv -v -t \"${2}\" \"`basename `{}\" +" \; | tee -a "${cur_log_file_path}"; 
+    find "${1}" -mtime ${how_many_days} -type f -exec bash -c "echo \"{}\"; sleep 0.013; mv -v -t \"${2}\" \"`basename `{}\" +" \; | tee -a "${cur_log_file_path}"; 
     find "${1}" -empty -type d -exec bash -c "echo \"{}\"; sleep 0.13; rmdir {}" \; | tee -a "${cur_log_file_path}"; 
     #find "${1}" -empty -type d -exec bash -c "echo \"{}\"; sleep 0.33; rmdir {}" \; | tee -a "${cur_log_file_path}"; 
 
