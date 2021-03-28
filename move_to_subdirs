@@ -11,7 +11,7 @@ fi
 
 #Файл, позволяющий всё отменить
 echo "#!/bin/bash" >>anti.mv
-echo `date` >>anti.mv
+chmod +x anti.mv;
 
 for d in *.*; do echo -n "";
 
@@ -43,4 +43,6 @@ else
 fi
 
 done;
+
+
 
