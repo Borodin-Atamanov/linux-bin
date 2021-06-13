@@ -34,7 +34,7 @@ echo $threads;
 sleep 0.1;
 
 MAX_JOBS=$threads;
-MAX_JOBS=1;
+#MAX_JOBS=1;
 echo "$MAX_JOBS" > MAX_JOBS_VALUE;
 NEWDIRPNG="PNGed";
 NEWDIRJPEG="JPEGed";
@@ -82,4 +82,10 @@ rmdir --verbose "$TEMPDIR";
 rmdir --verbose "$COMPUTEDDIR";
 rm -v MAX_JOBS_VALUE;
 echo "All jobs done"; );
-
+sleep 0.3;
+find . -size 0 -type f -exec rm -v '{}' \;
+sleep 0.3;
+find . -empty -type d -exec rmdir -v '{}' \;
+sleep 0.3;
+find . -empty -type d -exec rmdir -v '{}' \;
+sleep 0.3;
