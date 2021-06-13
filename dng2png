@@ -1,0 +1,77 @@
+#!/bin/bash
+#Script converts DNG to PNG
+
+#echo "" > commands.bash;
+# input="$1";
+# if [ ! -s "$input" ];
+# then
+#     echo "First argument '$input' must be a input image file, but it is not "
+#     echo "Lets process all current directory"
+#     for i in *.*;
+#         do echo -e "\n$i: ";
+#         eval "$0 \"${i}\"";
+#     done;
+#     echo "";
+#     exit;
+# fi;
+#
+# sleeptime="0.15";
+# function execute_comm {
+#     sleeptime="0.1";
+#     echo -e "\n\nExecute '$1'";
+#     sleep $sleeptime;
+#     echo "$1" >> commands.bash;
+#     sleep $sleeptime;
+#     echo "";
+#     eval "$1";
+# }
+
+#Let's set CPU threads count
+threads=$(grep -c ^processor /proc/cpuinfo);
+#echo $threads;
+threads=$((threads / 2 - 1));
+echo $threads;
+sleep 0.1;
+
+i="$input";
+
+MAX_JOBS=$threads;
+echo "$MAX_JOBS" > MAX_JOBS_VALUE;
+NEWDIR="tifforppmimages";
+NEWDIRPNG="PNGed";
+NEWDIRJPEG="JPEGed";
+TEMPDIR="TEMPDIR";
+COMPUTEDDIR="COMPUTED";
+
+mkdir -pv "$NEWDIR"  "$TEMPDIR" "$COMPUTEDDIR" "$NEWDIRPNG" "$NEWDIRJPEG";
+
+time ( for f in *.dng; do ( echo "   $f"; \
+
+dcraw -v -q 1 -f -w -6 -p embed -T "${f}";
+
+/usr/bin/time --format=%e magick "${f%.*}.tiff" \
+-modulate 100%,199%,-100% \
+-colorspace sRGB  -auto-orient \
+-define jpeg:dct-method=float -interlace JPEG \
+-quality 100 -sampling-factor 4:4:4 \
+-define png:compression-level=9 \
++repage \
+-depth 16 \
+"${NEWDIRJPEG}/${f%.*}.jpg";
+mv -v "$f" "$COMPUTEDDIR/";
+rm -v "${f%.*}.tiff";
+rm -v "${f%.*}.ppm";
+#mv -v "${f%.*}.tiff" "${NEWDIR}/";
+#mv -v "${f%.*}.ppm" "${NEWDIR}/";
+) &
+MAX_JOBS=$(cat MAX_JOBS_VALUE);
+echo "Current jobs: $( jobs -r -p | wc -l ) MAX_JOBS: $MAX_JOBS ";
+if [[ $(jobs -r -p | wc -l) -ge $(( $MAX_JOBS - 0 )) ]]; then wait -n; fi;
+sleep 1;
+done; wait;
+mv -v  "$COMPUTEDDIR"/* ./;
+rmdir --verbose "$TEMPDIR";
+rmdir --verbose "$COMPUTEDDIR";
+rm -v MAX_JOBS_VALUE;
+echo "All jobs done"; );
+
