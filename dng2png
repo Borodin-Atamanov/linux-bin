@@ -50,17 +50,19 @@ dcraw -v -q 1 -f -w -6 -p embed -T "${f}";
 mv -v "${f%.*}.tiff" "${TEMPDIR}/";
 
 #Try to export exif-data from DNG
-exiftool -extractEmbedded -json "${f}" > "${NEWDIRJSON}/${f%.*}.json";
+exiftool -all:all -extractEmbedded -json -b "${f}"  > "${NEWDIRJSON}/${f%.*}.json";
 #Try to export exif-data from jpeg with same name
-exiftool -extractEmbedded -json "${f%.*}.jpg" > "${NEWDIRJSON}/${f%.*}-j.json";
+#exiftool -extractEmbedded -json "${f%.*}.jpg" > "${NEWDIRJSON}/${f%.*}-j.json";
 
 sed -i.bak '/FileName/d; /SourceFile/d; /FileType/d; /FileTypeExtension/d; /MIMEType/d; /MajorBrand/d; /Directory/d; /ExifToolVersion/d; /FileSize/d; /FileModifyDate/d; /MediaDataSize/d; /MediaDataOffset/d; ' "${NEWDIRJSON}/${f%.*}.json";
 
+#exiftool -overwrite_original -j+="${NEWDIRJSON}/${f%.*}.json" "${TEMPDIR}/${f%.*}.tiff";
 
 /usr/bin/time --format=%e magick "${TEMPDIR}/${f%.*}.tiff" \
+-auto-orient \
 -depth 16 \
 -modulate 100%,199%,-100% \
--colorspace sRGB  -auto-orient \
+-colorspace sRGB \
 -define jpeg:dct-method=float -interlace JPEG \
 -quality 100 -sampling-factor 4:4:4 \
 -define png:compression-level=9 \
@@ -68,11 +70,12 @@ sed -i.bak '/FileName/d; /SourceFile/d; /FileType/d; /FileTypeExtension/d; /MIME
 "${NEWDIRPNG}/${f%.*}.png";
 
 /usr/bin/time --format=%e magick "${TEMPDIR}/${f%.*}.tiff" \
+-auto-orient \
 -depth 16 \
 -modulate 100%,199%,-100% \
 -gamma 1.4 \
 -auto-level \
--colorspace sRGB  -auto-orient \
+-colorspace sRGB \
 -define jpeg:dct-method=float -interlace JPEG \
 -quality 100 -sampling-factor 4:4:4 \
 -define png:compression-level=9 \
