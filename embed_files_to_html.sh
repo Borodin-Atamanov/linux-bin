@@ -2,6 +2,32 @@
 #Script embed all image and video files in current directory to html file, use base64 encode
 #In some day document will stop to show documents. (Find "new Date >" in code below, and try to change date)
 
+if [ -z "$1" ];
+then
+    #No first argument
+    #Is data secret by default?
+    secret=true;
+    secret=false;
+else
+    if [ $1 == true ] || [ "$1" -gt "1" ];
+    then
+        secret=true;
+    else
+        secret=false;
+        if [ $1 == 0 ] || [ $1 == false ];
+        then
+        secret=false;
+        fi
+    fi;
+fi
+
+if [ $secret == true ];
+then
+    echo  "Secret mode on";
+else
+    echo  "Secret mode off";
+fi;
+
 OUTDIR="output";
 mkdir -pv "$OUTDIR";
 output="output/document-$(date "+%F-%H-%M-%S").htm";
@@ -17,6 +43,7 @@ stop_access_after_milliseconds_from_file_modify="${stop_access_after_millisecond
 
 #TODO add access restriction from file open (use cookies to save open time)
 
+#html document header
 IFS='' read -r -d '' html_file <<"@@@END_OF_DATA@@@"
 <!DOCTYPE html><html lang="ru"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -28,10 +55,10 @@ IFS='' read -r -d '' html_file <<"@@@END_OF_DATA@@@"
 <title>Document</title>
 <link href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADbOMTQ66TxqMMcwIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAs0D7JNv9M/yrRPqwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAk200rJd5R/SXgUv8k3lD8J9hOJwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG+Ffnx/1aP8d62T/H/Vo/xzgX6YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFuJmIxnqafsZ62r/GOZoyRnvbP8Z62r+F+hmLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF+h0CxbqbbgY/3n/FeZs5g/waREV5WzHGf99/xXkarYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABPpcF0W/4T/Ff+D/xPqcnkAAAAAE+xzKBLwd/YV/n7/EeduSgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAg34AIEO94cxHveKMA/5kFAAAAAAAAAAAP53RWEv+G/xHxet8g32AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3uenUQ/5T/De5+mAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACvODggz/mP8K84RoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI9op4CP+W/wb2ilUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAb5j1kF+pDyA/mRUQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPmRLAH8k64A+5NAAP8AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8BAP+TLQD/qgMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAP//AADx/wAA8f8AAOD/AADg/wAAxH8AAM5/AADvPwAA/58AAP+fAAD/7wAA//cAAP/7AAD//wAA//8AAA==" rel="icon" type="image/x-icon">
 @@@END_OF_DATA@@@
-
 echo -n "" > "${output}";
 echo -n "${html_file}" >> "${output}";
 
+#baseline styles
 IFS='' read -r -d '' css_style <<"@@@END_OF_DATA@@@"
 body,
 html
@@ -41,7 +68,7 @@ html
 	padding: 0;
 }
 
-img, video, embed
+img, video, embed, audio, a
 {
 	padding: 0;
 	display: block;
@@ -50,11 +77,22 @@ img, video, embed
 	max-width: 100%
 }
 
-.ontop
+.stretch100
 {
-	z-index: 57;
+	width: 100%;
+	height: 100%
 }
+@@@END_OF_DATA@@@
+b64_css_style=$( echo "${css_style}" | base64 --wrap=1023 );
+str_css_style=$( echo -n "<link href=\"data:text/css;base64,${b64_css_style}\" rel=\"stylesheet\" type=\"text/css\">"; );
+echo -n "${str_css_style}" >> "${output}";
 
+
+
+#Add this CSS styles for secret data only
+if [ $secret = true ];
+then
+IFS='' read -r -d '' css_style <<"@@@END_OF_DATA@@@"
 #backgr
 {
 	width: 100%;
@@ -70,17 +108,12 @@ img, video, embed
 	display: none;
 	visibility: hidden;
 }
-
-.stretch100
-{
-	width: 100%;
-	height: 100%
-}
 @@@END_OF_DATA@@@
-
 b64_css_style=$( echo "${css_style}" | base64 --wrap=1023 );
 str_css_style=$( echo -n "<link href=\"data:text/css;base64,${b64_css_style}\" rel=\"stylesheet\" type=\"text/css\">"; );
 echo -n "${str_css_style}" >> "${output}";
+fi;
+
 
 js_script_part1="";
 js_script_part1+="var absolute_maximum_access_date=${absolute_stop_access_after_date}; "
@@ -135,12 +168,34 @@ window.onload=onloadfun;
 js_script="${js_script_part1} ${js_script_part2}";
 b64_js_script=$( echo "${js_script}" | base64 --wrap=1023 );
 str_js_script=$( echo "<script src=\"data:text/javascript;base64,${b64_js_script}\"></script>"; );
-echo -n "${str_js_script}" >> "${output}";
 
+#Add this only if secret mode on
+if [ $secret = true ];
+then
+    echo -n "${str_js_script}" >> "${output}";
+fi;
+
+
+echo -n "</head><body>" >> "${output}";
+
+
+
+#Add this only if secret mode on
+if [ $secret = true ];
+then
 IFS='' read -r -d '' html_file <<"@@@END_OF_DATA@@@"
-</head><body><div id="backgr"><img class=stretch100 alt="document" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAQAAABKmM6bAAAAD0lEQVR42mNkwACMg1QIAAQCAAqyn4R8AAAAAElFTkSuQmCC"></div>
+<div id="backgr"><img class=stretch100 alt="document" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAQAAABKmM6bAAAAD0lEQVR42mNkwACMg1QIAAQCAAqyn4R8AAAAAElFTkSuQmCC"></div>
 @@@END_OF_DATA@@@
 echo -n "${html_file}" >> "${output}";
+fi;
+
+
+if [ $secret = true ];
+then
+    video_and_audio_suffix="autoplay loop muted preload=auto";
+else
+    video_and_audio_suffix="controls loop preload=auto";
+fi;
 
 for f in *.*;
 do echo -n "";
@@ -149,11 +204,16 @@ echo -n $mime_type;
 echo "   $f";
 b64_file_data=$( cat "${f}" | base64 --wrap=1023 );
 if [[ $mime_type == *"image/"* ]]; then
-	str_file_data=$( echo -n "<img class=\"secret\" src=\"data:${mime_type};base64,${b64_file_data}\" class=\"secret\" title=\"${f}\" alt=\"${f}\">"; );
+	str_file_data=$( echo -n "<img class=\"secret\" src=\"data:${mime_type};base64,${b64_file_data}\" class=\"secret\" title=\"${f}\" alt=\"${f}\" download=\"${f}\">"; );
 elif [[ $mime_type == *"video/"* ]]; then
-	str_file_data=$( echo -n "<video autoplay loop muted preload=auto><source src=\"data:${mime_type};base64,${b64_file_data}\" class=\"secret\" title=\"${f}\" alt=\"${f}\" type=\"${mime_type}\">Your browser does not support mp4 documents</video>"; );
-elif [[ $mime_type == *"pdf"* ]]; then
-	str_file_data=$( echo -n "<embed src=\"data:${mime_type};base64,${b64_file_data}\" class=\"secret ontop\" title=\"${f}\" alt=\"${f}\"  type=\"${mime_type}\">"; );
+	str_file_data=$( echo -n "<video ${video_and_audio_suffix} source src=\"data:${mime_type};base64,${b64_file_data}\" class=\"secret\" title=\"${f}\" alt=\"${f}\"  download=\"${f}\"  type=\"${mime_type}\">This document is too cool for your browser</video>"; );
+elif [[ $mime_type == *"audio/"* ]]; then
+	str_file_data=$( echo -n "<audio ${video_and_audio_suffix} source src=\"data:${mime_type};base64,${b64_file_data}\" class=\"secret\" title=\"${f}\" alt=\"${f}\"  download=\"${f}\"  type=\"${mime_type}\">This document is too cool for your browser</audio>"; );
+else
+    #any other type of file
+    if [ $secret != true ]; then
+        str_file_data=$( echo -n "<a download=\"${f}\" href=\"data:${mime_type};base64,${b64_file_data}\" class=\"secret\" type=\"${mime_type}\" title=\"${f}\" alt=\"${f}\">${f}</a>"; );
+    fi;
 fi
 echo -n "${str_file_data}" >> "${output}";
 str_file_data="";
@@ -179,9 +239,6 @@ js_script_part3+='!function(e,t,a){(t[a]=t[a]||[]).push(function(){try{t.yaCount
 js_script_part3+="${yandex_metrika_id}";
 js_script_part3+=',clickmap:!0,trackLinks:!0,accurateTrackBounce:!0,webvisor:!0})}catch(e){}});function c(){n.parentNode.insertBefore(r,n)}var n=e.getElementsByTagName("script")[0],r=e.createElement("script");r.type="text/javascript",r.async=!0,r.src="https://mc.yandex.ru/metrika/watch.js","[object Opera]"==t.opera?e.addEventListener("DOMContentLoaded",c,!1):c()}(document,window,"yandex_metrika_callbacks");';
 
-IFS='' read -r -d '' js_script <<"@@@END_OF_DATA@@@"
-!function(e,t,a){(t[a]=t[a]||[]).push(function(){try{t.yaCounter16400947=new Ya.Metrika({id:16400947,clickmap:!0,trackLinks:!0,accurateTrackBounce:!0,webvisor:!0})}catch(e){}});function c(){n.parentNode.insertBefore(r,n)}var n=e.getElementsByTagName("script")[0],r=e.createElement("script");r.type="text/javascript",r.async=!0,r.src="https://mc.yandex.ru/metrika/watch.js","[object Opera]"==t.opera?e.addEventListener("DOMContentLoaded",c,!1):c()}(document,window,"yandex_metrika_callbacks");
-@@@END_OF_DATA@@@
 b64_js_script=$( echo "${js_script_part3}" | base64 --wrap=1023 );
 str_js_script=$( echo "<script src=\"data:text/javascript;base64,${b64_js_script}\"></script>"; );
 echo -n "${str_js_script}" >> "${output}";
