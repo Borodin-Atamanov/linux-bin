@@ -68,7 +68,6 @@ sed -i.bak '/FileName/d; /SourceFile/d; /FileType/d; /FileTypeExtension/d; /MIME
 #Import exif to new jpeg file
 exiftool -overwrite_original -j+="${NEWDIRJSON}/${f%.*}.json" "${NEWDIRJPEG}/${f%.*}.jpg";
 
-
 mv -v "$f" "$COMPUTEDDIR/";
 rm -v "${TEMPDIR}/${f%.*}.tiff";
 ) &
