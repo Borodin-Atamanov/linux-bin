@@ -43,6 +43,7 @@ frames=21;
 crf=45;
 OUTDIR="$format-${fps}fps-${frames}frames-${crf}crf";
 mkdir -p "$OUTDIR";
-time ffmpeg -y -hide_banner -loglevel debug -r $fps -i "$i" -an -vf setsar=1:1,scale=h='trunc(min(2160\,ih)/2)*2':w=-2,setsar=1:1,loop=loop=$frames:size=1:start=0,fps=$fps,mpdecimate,format=pix_fmts=yuv420p\|yuvj420p,fps=$fps \
+time ffmpeg -y -hide_banner -loglevel debug -r $fps -i "$i" -an -vf setsar=1:1,scale=w='trunc(min(3840\,iw)/2)*2':h='trunc(min(2160\,ih)/2)*2':force_original_aspect_ratio=decrease:flags=lanczos,setsar=1:1,pad=width='ceil(iw/2)*2':height='ceil(ih/2)*2',setsar=1:1,loop=loop=$frames:size=1:start=0,fps=$fps,mpdecimate,format=pix_fmts=yuv420p\|yuvj420p,fps=$fps \
 -frames:v $frames -crf $crf -preset veryslow -profile:v main -vcodec h264 \
 -x264-params min-keyint=31337:keyint_min=31337:keyint=31337:scenecut=31337:ref=1 -movflags faststart "$OUTDIR/${i%.*}.$format";
+
