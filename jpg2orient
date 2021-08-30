@@ -1,0 +1,58 @@
+#!/bin/bash
+#Script orients jpegs
+
+#Let's set CPU threads count
+threads=$(grep -c ^processor /proc/cpuinfo);
+#echo $threads;
+threads=$((threads / 2 - 1));
+echo $threads;
+sleep 0.1;
+
+MAX_JOBS=$threads;
+MAX_JOBS=1;
+echo "$MAX_JOBS" > MAX_JOBS_VALUE;
+
+NEWDIR="lossless-auto-rotated-repair";
+EXIFDIR="jsonexif";
+COMPUTEDDIR="computed";
+mkdir -pv "${NEWDIR}";
+mkdir -pv "${EXIFDIR}";
+mkdir -pv "${COMPUTEDDIR}";
+
+time ( for f in *.*; do ( echo "   $f"; \
+
+echo " $f";
+
+orient=$( /usr/bin/time --format=%e identify -verbose "${f}" | grep "exif:Orientation" );
+orient="${orient: -1}";
+
+outf="${NEWDIR}"/"${f%.*}-o${orient}.jpg";
+
+jpegtran -copy none -outfile "${outf}" "${f}";
+
+exiftool -all:all -b -extractEmbedded -json "${f}" > "$EXIFDIR/${f%.*}.json";
+
+sed -i '/Orientation/d; /FileName/d; /SourceFile/d; /FileType/d; /FileTypeExtension/d; /MIMEType/d; /MajorBrand/d; /Directory/d; /ExifToolVersion/d; /FileSize/d; /FileModifyDate/d; /MediaDataSize/d; /MediaDataOffset/d;' "$EXIFDIR/${f%.*}.json";
+
+exiftool -overwrite_original -j+="$EXIFDIR/${f%.*}.json" "${outf}";
+
+mv -v "$f" "$COMPUTEDDIR/";
+
+) &
+MAX_JOBS=$(cat MAX_JOBS_VALUE);
+echo "Current jobs: $( jobs -r -p | wc -l ) MAX_JOBS: $MAX_JOBS ";
+if [[ $(jobs -r -p | wc -l) -ge $(( $MAX_JOBS - 0 )) ]]; then wait -n; fi;
+sleep 1;
+done; wait;
+mv -v  "$COMPUTEDDIR"/* ./;
+rmdir --verbose "$COMPUTEDDIR";
+mv -v computed/* ./; rmdir computed
+rm -v MAX_JOBS_VALUE;
+echo "All jobs done"; );
+sleep 0.3;
+find . -size 0 -type f -exec rm -v '{}' \;
+sleep 0.3;
+find . -empty -type d -exec rmdir -v '{}' \;
+sleep 0.3;
+find . -empty -type d -exec rmdir -v '{}' \;
+sleep 0.3;
