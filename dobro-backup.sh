@@ -12,18 +12,11 @@ GIT_DIR="/home/i/git-linux-bin-fresh/";
 mkdir -pv "${GIT_DIR}" | tee -a "${log_file_path}"
 
 function nowcopy () {
+    #create hard links to files in target directory
     echo -e "\n\n\n";
     echo "`date +%Y-%m-%d-%H-%M-%S`: copy from ${1} to ${2}"  | tee -a "${log_file_path}"
     #rsync --dry-run
     #rsync --info=progress2 --checksum --progress --recursive --human-readable --verbose --exclude=".git" --exclude=".sync"  "${1}" "${2}" | tee -a "${log_file_path}"
-    time cp --no-clobber --archive --link --dereference --recursive --strip-trailing-slashes --verbose "${1}" "${2}";
-}
-
-function nowcopy_small_files () {
-    echo -e "\n\n\n";
-    echo "`date +%Y-%m-%d-%H-%M-%S`: copy smallfiles from ${1} to ${2}"  | tee -a "${log_file_path}"
-    #rsync --dry-run
-    #rsync --info=progress2 --checksum --progress --recursive --human-readable --verbose --exclude=".git" --exclude=".sync" --max-size=40m  "${1}" "${2}" | tee -a "${log_file_path}"
     time cp --no-clobber --archive --link --dereference --recursive --strip-trailing-slashes --verbose "${1}" "${2}";
 }
 
@@ -51,15 +44,15 @@ sleep 0.01;
 zlo="/home/i/.zlo";
 mkdir -pv "${zlo}";
 sleep 0.01;
-nowcopy_small_files "/home/i/Изображения/" "${zlo}/screen/";
+nowcopy "/home/i/Изображения/" "${zlo}/screen/";
 sleep 0.01;
 nowcopy "/home/i/downloads/" "${zlo}/downloads/";
 sleep 0.01;
-nowcopy_small_files "/home/i/screencasts/" "${zlo}/screen/";
+nowcopy "/home/i/screencasts/" "${zlo}/screen/";
 sleep 0.01;
-nowcopy_small_files "/home/i/screenshots/" "${zlo}/screen/";
+nowcopy "/home/i/screenshots/" "${zlo}/screen/";
 sleep 0.01;
-nowcopy_small_files "/home/i/mpv-screenshots/" "${zlo}/screen/";
+nowcopy "/home/i/mpv-screenshots/" "${zlo}/screen/";
 sleep 0.01;
 
 
