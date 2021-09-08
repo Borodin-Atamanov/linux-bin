@@ -1,0 +1,6 @@
+#!/bin/bash
+#Скрипт создаёт копию текущей папки с помощью жёстких ссылок
+HDIR='hard-links-copy';
+mkdir -pv "../${HDIR}";
+time cp --interactive --archive --link --dereference --recursive --strip-trailing-slashes --verbose . "../${HDIR}/";
+mv -v "../${HDIR}" "${HDIR}";
