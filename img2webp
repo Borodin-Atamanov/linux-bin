@@ -1,0 +1,49 @@
+#!/bin/bash
+#Script converts images to webP
+#echo "" > commands.bash;
+
+input="$1";
+if [ ! -s "$input" ];
+then
+    echo "First argument '$input' must be a input image file, but it is not "
+    echo "Lets process all current directory"
+    for i in *.*;
+        do echo -e "\n$i: ";
+        eval "$0 \"${i}\"";
+    done;
+    echo "";
+    exit;
+fi;
+
+sleeptime="0.15";
+function execute_comm {
+    sleeptime="0.1";
+    echo -e "\n\nExecute '$1'";
+    sleep $sleeptime;
+    echo "$1" >> commands.bash;
+    sleep $sleeptime;
+    echo "";
+    eval "$1";
+}
+
+#Let's set CPU threads count
+threads=$(grep -c ^processor /proc/cpuinfo);
+#echo $threads;
+threads=$((threads * 2 + 0));
+echo $threads;
+sleep 0.1;
+
+i="$input";
+
+QUALITY=74;
+NEWDIR="webP-$QUALITY";
+mkdir -pv "$NEWDIR";
+LOSSLESS=" -near_lossless 0 -lossless -z 9 "; \
+LOSSLESS=" "; \
+/usr/bin/time --format=%e \
+cwebp -q $QUALITY -m 6 -sharp_yuv -pass 10 -pre 3 -mt -af \
+-alpha_filter best -noalpha \
+-metadata xmp -metadata exif -v -progress -print_psnr -print_ssim -print_lsim \
+$LOSSLESS \
+"${i}" -o "${NEWDIR}/${i%.*}.webp";
+
