@@ -1,0 +1,47 @@
+#!/bin/bash
+#Script converts images to mp4 static videos
+ffmpeg_alternative=ffmpeg
+
+#echo "" > commands.bash;
+
+input="$1";
+if [ ! -s "$input" ];
+then
+    echo "First argument '$input' must be a input image file, but it is not "
+    echo "Lets process all current directory"
+    for i in *.*;
+        do echo -e "\n$i: ";
+        eval "$0 \"${i}\"";
+    done;
+    echo "";
+    exit;
+fi;
+
+sleeptime="0.15";
+function execute_comm {
+    sleeptime="0.1";
+    echo -e "\n\nExecute '$1'";
+    sleep $sleeptime;
+    echo "$1" >> commands.bash;
+    sleep $sleeptime;
+    echo "";
+    eval "$1";
+}
+
+#Let's set CPU threads count
+threads=$(grep -c ^processor /proc/cpuinfo);
+#echo $threads;
+threads=$((threads * 2 + 0));
+echo $threads;
+sleep 0.1;
+
+i="$input";
+
+format="PNG24";
+OUTDIR="${format}";
+mkdir -p "$OUTDIR";
+echo "$i";
+/usr/bin/time --format=%e convert -verbose -monitor "$i" -depth 8 -colorspace sRGB -auto-orient -quality 100 -define png:compression-level=9 +repage "${format}:${OUTDIR}/${i%.*}.png";
+
+
+
